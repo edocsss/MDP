@@ -1,35 +1,38 @@
-char data;
-int ledPin = 13;
+#include <LiquidCrystal.h>
+#define PIN_BL 10
+
+LiquidCrystal lcd(8, 9, 4, 5, 6, 7);
+String s = "";
 
 void setup () {
   Serial.begin(9600);
-  pinMode(ledPin, OUTPUT);
+  lcd.begin(16, 2);
+  pinMode(PIN_BL, OUTPUT);
+  analogWrite(PIN_BL, 100);
   
-  // Send test data
-  for (int i = 0; i < 5; i++) {
-    Serial.println(i);
+  char shake = '0';
+  while (shake != 'R') {
+    if (Serial.available()) {
+      shake = Serial.read();
+    }
   }
   
-  delay(1000);
+  Serial.println("S");
 }
 
 void loop () {
-//  Serial.println("test data");
-  delay(1000);
-//  Serial.println("test data 2");
-  delay(1000);
+  while (Serial.available() > 0) {
+    char r = Serial.read();
+    
+    if (r == '\n') {
+      lcd.clear();
+      lcd.setCursor(0, 0);
+      lcd.print(s);
+      break;
+    }
+    
+    s += r;
+  }
   
-  if (Serial.available()) {
-    data = Serial.read();
-    blinkLed();
-  }
-}
-
-void blinkLed () {
-  for (int i = 0; i < 2; i++) {
-    digitalWrite(ledPin, HIGH);
-    delay(500);
-    digitalWrite(ledPin, LOW);
-    delay(500);
-  }
+  delay(50);
 }
