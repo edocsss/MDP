@@ -1,9 +1,9 @@
-import Simulator_WallBuilder.ArenaMap as ArenaMap
-import Simulator_WallBuilder.Sensor as Sensor
-from Simulator_WallBuilder.RobotOrientation import *
-from Simulator_WallBuilder.GridState import *
-from Simulator_WallBuilder.SensorPosition import *
-from Simulator_WallBuilder.SensorRange import *
+import ArenaMap as ArenaMap
+import Sensor as Sensor
+from RobotOrientation import *
+from GridState import *
+from SensorPosition import *
+from SensorRange import *
 
 __author__ = 'ECAND_000'
 

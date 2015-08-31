@@ -1,4 +1,4 @@
-from Simulator_WallBuilder.GridState import *
+from GridState import *
 
 __author__ = 'ECAND_000'
 

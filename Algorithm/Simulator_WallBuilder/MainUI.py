@@ -1,8 +1,8 @@
 import tkinter
-import Simulator_WallBuilder.ArenaMap as ArenaMap
+import ArenaMap as ArenaMap
 import threading
-from Simulator_WallBuilder.GridState import *
-from Simulator_WallBuilder.RobotOrientation import *
+from GridState import *
+from RobotOrientation import *
 
 __author__ = 'ECAND_000'
 

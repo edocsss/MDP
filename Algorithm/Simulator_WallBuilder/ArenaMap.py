@@ -1,5 +1,5 @@
-from Simulator_WallBuilder.Grid import *
-from Simulator_WallBuilder.GridState import *
+from Grid import *
+from GridState import *
 
 __author__ = 'ECAND_000'
 

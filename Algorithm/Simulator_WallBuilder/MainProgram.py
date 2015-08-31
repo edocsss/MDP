@@ -1,10 +1,10 @@
-import Simulator_WallBuilder.Algorithm as Algorithm
-import Simulator_WallBuilder.ArenaMap as ArenaMap
-import Simulator_WallBuilder.MainUI as MainUI
-import Simulator_WallBuilder.Robot as Robot
-import Simulator_WallBuilder.WifiComm as WifiComm
-import Simulator_WallBuilder.RobotController as RobotController
-import Simulator_WallBuilder.WallBuilder as WallBuilder
+import Algorithm as Algorithm
+import ArenaMap as ArenaMap
+import MainUI as MainUI
+import Robot as Robot
+import WifiComm as WifiComm
+import RobotController as RobotController
+import WallBuilder as WallBuilder
 import time
 
 __author__ = 'ECAND_000'
