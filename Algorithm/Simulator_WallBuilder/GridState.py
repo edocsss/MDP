@@ -8,3 +8,4 @@ class GridState(Enum):
     EXPLORED_WITH_OBSTACLE = 2
     START_ZONE = 4
     END_ZONE = 5
+    END_ZONE_EXPLORED = 6

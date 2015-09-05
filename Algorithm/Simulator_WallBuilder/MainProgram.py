@@ -9,10 +9,6 @@ import time
 
 __author__ = 'ECAND_000'
 
-def startExploration():
-    global startExplore
-    startExplore = True
-
 # Wi-Fi HOST & PORT
 host = "192.168.7.7"
 port = 7777
@@ -31,10 +27,6 @@ algorithm = None
 wifiComm = WifiComm.WifiComm(host, port)
 ui = MainUI.MainUI(initialMap, obstacleMap, robot)
 robotController = RobotController.RobotController(obstacleMap, robot, algorithm, wifiComm, ui)
-
-# while wallBuilder.isStartExplorationWindow() == False:
-#     # Do nothing
-#     time.sleep(0.2)
 
 ui.open()
 while ui.isStartExplore() == False:

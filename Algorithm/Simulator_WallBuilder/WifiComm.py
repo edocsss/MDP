@@ -32,6 +32,8 @@ class WifiComm:
 
     def write(self, data):
         print("Sending data from Laptop to RPi: " + str(data))
+
+        # Assume that the terminator is "\n" --> so that the Arduino / Android / RPi knows when to stop reading
         data = data + "\n"
         self.soc.sendall(data.encode())
         time.sleep(self.INTER_WRITING_DELAY)
@@ -42,6 +44,8 @@ class WifiComm:
         c = ""
 
         while c != '\n':
+            # This is a blocking READ operation
+            # USE BLOCKING SINCE WE NEED TO READ THE WHOLE SENSOR READING BEFORE PROCEEDING WITH THE ALGORITHM EXECUTION
             c = self.soc.recv(1).decode()
             data += c
 

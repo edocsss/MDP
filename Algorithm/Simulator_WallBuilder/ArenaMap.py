@@ -49,7 +49,13 @@ class ArenaMap:
         count = 0
         for m in range (0, self.MAP_HEIGHT):
             for n in range (0, self.MAP_WIDTH):
-                if self.gridMap[m][n].getGridState() == GridState.EXPLORED_NO_OBSTACLE or self.gridMap[m][n].getGridState() == GridState.EXPLORED_WITH_OBSTACLE:
+                if self.gridMap[m][n].getGridState() == GridState.START_ZONE \
+                   or self.gridMap[m][n].getGridState() == GridState.EXPLORED_NO_OBSTACLE \
+                   or self.gridMap[m][n].getGridState() == GridState.EXPLORED_WITH_OBSTACLE\
+                   or self.gridMap[m][n].getGridState() == GridState.END_ZONE_EXPLORED:
                     count += 1
 
         return count
+
+    def getPercentageExploredGrids(self):
+        return 100 * self.countExploredGrids() / (self.MAP_HEIGHT * self.MAP_WIDTH)

@@ -1,6 +1,7 @@
 import tkinter
 import ArenaMap as ArenaMap
 import threading
+import time
 from GridState import *
 from RobotOrientation import *
 
@@ -12,7 +13,7 @@ __author__ = 'ECAND_000'
 class MainUI(threading.Thread):
     GRID_EDGE_SIZE = 27
     GRID_BOTTOM_MOST = 560
-    MARGIN_LEFT = 50
+    MARGIN_LEFT = 490
     MARGIN_RIGHT = 30
     MARGIN_TOP = 50
     MARGIN_BOTTOM = 50
@@ -30,6 +31,10 @@ class MainUI(threading.Thread):
         self.arenaMap = arenaMap
         self.obstacleMap = obstacleMap
         self.robot = robot
+        self.robotSpeed = 0.1
+        self.maxPercentage = 100.00
+        self.maxTime = 1000.00 # In seconds
+        self.startTime = time.time() # Any initial time --> does not really matter since the starting time will be overwritten in self.startExplore()
 
     def open(self):
         self.start()
@@ -40,6 +45,9 @@ class MainUI(threading.Thread):
     def startExplore(self):
         self.startExploration = True
 
+        # Start timer
+        self.startTime = time.time()
+
     def startExplorationWindow(self):
         self.canvas.delete("all")
         self.saveButton.destroy()
@@ -48,9 +56,10 @@ class MainUI(threading.Thread):
     def run(self):
         self.root = tkinter.Tk()
         self.root.protocol("WM_DELETE_WINDOW", self.callback)
+        self.root.wm_state('zoomed')
 
-        self.canvas = tkinter.Canvas(width=510, height=600, bg="white")
-        self.canvas.grid(column=0, row=0)
+        self.canvas = tkinter.Canvas(width=self.root.winfo_screenwidth(), height=600, bg="white")
+        self.canvas.pack()
 
         # Define Maze
         self.buildWall()
@@ -58,7 +67,7 @@ class MainUI(threading.Thread):
 
     def buildWall(self):
         self.saveButton = tkinter.Button(self.root, text="Save Obstacles!", command=self.startExplorationWindow)
-        self.saveButton.grid(row=2, columnspan=5, ipadx=10, ipady=10, pady=20)
+        self.saveButton.pack(ipadx=10, ipady=10, pady=20)
 
         # Initialize rectangles
         for i in range (0, ArenaMap.ArenaMap.MAP_HEIGHT):
@@ -73,8 +82,31 @@ class MainUI(threading.Thread):
                 self.canvas.tag_bind(self.obstacleRectangles[i][j], '<ButtonPress-1>', self.onGridClick)
 
     def openExplorationWindow(self):
-        startButton = tkinter.Button(self.root, text="Explore!", command=self.startExplore)
-        startButton.grid(row=2, columnspan=5, ipadx=10, ipady=10, pady=20)
+        # Add Textbox for X moves / second here --> user selects X
+        self.movesPerSecondBox = tkinter.Entry(self.root, width=5)
+        self.movesPerSecondBox.pack(side=tkinter.LEFT, padx=20)
+        self.movesPerSecondButton = tkinter.Button(self.root, text="Change Speed!", command=self.changeRobotSpeed)
+        self.movesPerSecondButton.pack(side=tkinter.LEFT)
+
+        # Initially it's 3.00 % since the start zone is basically already explored
+        self.percentageLabel = tkinter.Label(self.root, text="3.00%")
+        self.percentageLabel.pack(side=tkinter.LEFT, padx=10, ipadx=20)
+        self.percentageStopBox = tkinter.Entry(self.root, width=7)
+        self.percentageStopBox.pack(side=tkinter.LEFT, padx=20)
+        self.percentageButton = tkinter.Button(self.root, text="Set Percentage!", command=self.setMaxPercentage)
+        self.percentageButton.pack(side=tkinter.LEFT, padx=10)
+
+        # Timer box
+        self.timerStopBox = tkinter.Entry(self.root, width=7)
+        self.timerStopBox.pack(side=tkinter.LEFT, padx=20)
+        self.timerStopButton = tkinter.Button(self.root, text="Set Timeout!", command=self.setTimeout)
+        self.timerStopButton.pack(side=tkinter.LEFT, padx=10)
+
+        # Start Exploration button
+        self.startButton = tkinter.Button(self.root, text="Explore!", command=self.startExplore)
+        self.startButton.pack(ipadx=10, ipady=10, padx=200, pady=20, side=tkinter.LEFT)
+
+        # Add button to save the user selectable X moves / second here
 
         # Initialize rectangles
         for i in range (0, ArenaMap.ArenaMap.MAP_HEIGHT):
@@ -105,14 +137,45 @@ class MainUI(threading.Thread):
     def isStartExplore(self):
         return self.startExploration
 
+    def changeRobotSpeed(self):
+        read = self.movesPerSecondBox.get()
+        if len(read) > 0:
+            self.robotSpeed = 1 / int(read)
+
+    def setMaxPercentage(self):
+        read = self.percentageStopBox.get()
+        if len(read) > 0:
+            self.maxPercentage = int(read)
+
+    def setMapPercentage(self):
+        currentPercentage = self.arenaMap.getPercentageExploredGrids()
+
+        # Stop whenever the current percentage is reached
+        if currentPercentage >= self.maxPercentage:
+            return False
+
+        self.percentageLabel["text"] = "{:.2f}%".format(self.arenaMap.getPercentageExploredGrids())
+        return True
+
+    def setTimeout(self):
+        read = self.timerStopBox.get()
+        if len(read) > 0:
+            self.maxTime = int(read)
+
+    def checkTimeout(self):
+        now = time.time()
+        print(now, self.startTime, now - self.startTime)
+        if (now - self.startTime) >= self.maxTime:
+            return False
+
+        return True
+
     def draw(self):
         self.drawMap()
         self.drawRobot()
 
     # Remember that point (0, 0) is the left bottom most grid
     def drawMap(self):
-        gridMap = self.arenaMap.getGridMap()
-
         for i in range (0, self.arenaMap.MAP_HEIGHT):
             for j in range (0, self.arenaMap.MAP_WIDTH):
                 self.drawGrid(j, i)
@@ -127,7 +190,7 @@ class MainUI(threading.Thread):
             fillColor = "#333333"
         elif gridState == GridState.START_ZONE:
             fillColor = "#00FF00"
-        elif gridState == GridState.END_ZONE:
+        elif gridState == GridState.END_ZONE or gridState == GridState.END_ZONE_EXPLORED:
             fillColor = "#FF0000"
 
         self.canvas.itemconfig(self.rectangles[y][x], fill=fillColor)
@@ -145,12 +208,12 @@ class MainUI(threading.Thread):
 
     def drawRobot(self):
         robotOrientation = self.robot.getOrientation()
-        # fillFront = fillLeft = fillRight = fillBack = "#00A2E8"
+        # self.setMapPercentage()
+        # timeoutStop = self.checkTimeout()
+        time.sleep(self.robotSpeed)
 
         # DRAW WHITE RECTANGLES FOR THE ROBOT TRAIL --> ROBOT_CENTER.ROW - 2
         if robotOrientation == RobotOrientation.FRONT:
-            # fillFront = "#00A2E8"
-
             positionX = self.robot.getPositionX()
             positionY = self.robot.getPositionY()
 
@@ -169,22 +232,21 @@ class MainUI(threading.Thread):
                         fillColor = "#333333"
                     elif self.arenaMap.getGridMap()[positionY - 2][positionX + i].getGridState() == GridState.START_ZONE:
                         fillColor = "#00FF00"
-                    elif self.arenaMap.getGridMap()[positionY - 2][positionX + i].getGridState() == GridState.END_ZONE:
+                    elif self.arenaMap.getGridMap()[positionY - 2][positionX + i].getGridState() == GridState.END_ZONE\
+                         or self.arenaMap.getGridMap()[positionY - 2][positionX + i].getGridState() == GridState.END_ZONE_EXPLORED:
                         fillColor = "#FF0000"
 
                     self.canvas.itemconfig(self.rectangles[positionY - 2][positionX + i], fill=fillColor)
 
         # DRAW WHITE RECTANGLES FOR THE ROBOT TRAIL --> ROBOT_CENTER.ROW + 2
         elif robotOrientation == RobotOrientation.BACK:
-            # fillBack = "#00A2E8"
-
             positionX = self.robot.getPositionX()
             positionY = self.robot.getPositionY()
 
             if (self.robot.getPositionY() + 2) <= ArenaMap.ArenaMap.MAP_HEIGHT - 1\
-                and self.arenaMap.getGrid(positionX - 1, positionY + 2).getGridState() != GridState.EXPLORED_WITH_OBSTACLE\
-                and self.arenaMap.getGrid(positionX, positionY + 2).getGridState() != GridState.EXPLORED_WITH_OBSTACLE\
-                and self.arenaMap.getGrid(positionX + 1, positionY + 2).getGridState() != GridState.EXPLORED_WITH_OBSTACLE:
+                and self.arenaMap.getGrid(positionY + 2, positionX - 1).getGridState() != GridState.EXPLORED_WITH_OBSTACLE\
+                and self.arenaMap.getGrid(positionY + 2, positionX).getGridState() != GridState.EXPLORED_WITH_OBSTACLE\
+                and self.arenaMap.getGrid(positionY + 2, positionX + 1).getGridState() != GridState.EXPLORED_WITH_OBSTACLE:
 
                 for i in range (-1, 2):
                     fillColor = ""
@@ -196,15 +258,14 @@ class MainUI(threading.Thread):
                         fillColor = "#333333"
                     elif self.arenaMap.getGridMap()[positionY + 2][positionX + i].getGridState() == GridState.START_ZONE:
                         fillColor = "#00FF00"
-                    elif self.arenaMap.getGridMap()[positionY + 2][positionX + i].getGridState() == GridState.END_ZONE:
+                    elif self.arenaMap.getGridMap()[positionY + 2][positionX + i].getGridState() == GridState.END_ZONE\
+                         or self.arenaMap.getGridMap()[positionY + 2][positionX + i].getGridState() == GridState.END_ZONE_EXPLORED:
                         fillColor = "#FF0000"
 
                     self.canvas.itemconfig(self.rectangles[positionY + 2][positionX + i], fill=fillColor)
 
         # DRAW WHITE RECTANGLES FOR THE ROBOT TRAIL --> ROBOT_CENTER.COL + 2
         elif robotOrientation == RobotOrientation.LEFT:
-            # fillLeft = "#00A2E8"
-
             positionX = self.robot.getPositionX()
             positionY = self.robot.getPositionY()
 
@@ -223,15 +284,14 @@ class MainUI(threading.Thread):
                         fillColor = "#333333"
                     elif self.arenaMap.getGridMap()[positionY + i][positionX + 2].getGridState() == GridState.START_ZONE:
                         fillColor = "#00FF00"
-                    elif self.arenaMap.getGridMap()[positionY + i][positionX + 2].getGridState() == GridState.END_ZONE:
+                    elif self.arenaMap.getGridMap()[positionY + i][positionX + 2].getGridState() == GridState.END_ZONE \
+                         or self.arenaMap.getGridMap()[positionY + i][positionX + 2].getGridState() == GridState.END_ZONE_EXPLORED:
                         fillColor = "#FF0000"
 
                     self.canvas.itemconfig(self.rectangles[positionY + i][positionX + 2], fill=fillColor)
 
         # DRAW WHITE RECTANGLES FOR THE ROBOT TRAIL --> ROBOT_CENTER.COL - 2
         elif robotOrientation == RobotOrientation.RIGHT:
-            # fillRight = "#00A2E8"
-
             positionX = self.robot.getPositionX()
             positionY = self.robot.getPositionY()
 
@@ -250,7 +310,8 @@ class MainUI(threading.Thread):
                         fillColor = "#333333"
                     elif self.arenaMap.getGridMap()[positionY + i][positionX - 2].getGridState() == GridState.START_ZONE:
                         fillColor = "#00FF00"
-                    elif self.arenaMap.getGridMap()[positionY + i][positionX - 2].getGridState() == GridState.END_ZONE:
+                    elif self.arenaMap.getGridMap()[positionY + i][positionX - 2].getGridState() == GridState.END_ZONE\
+                         or self.arenaMap.getGridMap()[positionY + i][positionX - 2].getGridState() == GridState.END_ZONE_EXPLORED:
                         fillColor = "#FF0000"
 
                     self.canvas.itemconfig(self.rectangles[positionY + i][positionX - 2], fill=fillColor)
@@ -269,4 +330,4 @@ class MainUI(threading.Thread):
         elif robotOrientation == RobotOrientation.LEFT:
             self.canvas.itemconfig(self.rectangles[self.robot.getPositionY()][self.robot.getPositionX() - 1], fill="#9FDDEC")
         elif robotOrientation == RobotOrientation.RIGHT:
-            self.canvas.itemconfig(self.rectangles[self.robot.getPositionY()][self.robot.getPositionX() + 1], fill="#9FDDEC")
+                self.canvas.itemconfig(self.rectangles[self.robot.getPositionY()][self.robot.getPositionX() + 1], fill="#9FDDEC")
