@@ -7,7 +7,8 @@ class Algorithm:
         value = 0
         for i in range(height):
             for j in range(width):
-                value = 288 - 16 * (j + 1)
+                if state.map[i][j] == Grid.unexplored:
+                    value = 288 - 16 * (j + 1)
     
     @staticmethod
     def A_star(start_state):
