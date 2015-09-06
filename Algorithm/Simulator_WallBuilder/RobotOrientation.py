@@ -4,6 +4,6 @@ __author__ = 'ECAND_000'
 
 class RobotOrientation(Enum):
     FRONT = 0
-    BACK = 1
-    LEFT = 2
+    BACK = 2
+    LEFT = 1
     RIGHT = 3

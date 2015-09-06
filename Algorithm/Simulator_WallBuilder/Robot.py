@@ -4,6 +4,7 @@ from RobotOrientation import *
 from GridState import *
 from SensorPosition import *
 from SensorRange import *
+from Action import *
 
 __author__ = 'ECAND_000'
 
@@ -20,13 +21,16 @@ class Robot:
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1)),
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (0, 1)),
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1)),
-            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1)),
-            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (0, 1)),
-            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1))
+            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1), -1),
+            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (0, 1), -1),
+            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1), -1)
         ]
 
         self.mapKnowledge = initialMap
 
+    def __hash__(self):
+        return hash((self.x, self.y, self.orientation, self.mapKnowledge))
+    
     def getPositionX(self):
         return self.x
 
@@ -46,14 +50,18 @@ class Robot:
         self.orientation = orientation
 
     def moveForward(self):
-        if self.orientation == RobotOrientation.FRONT:
-            self.y += 1
-        elif self.orientation == RobotOrientation.LEFT:
-            self.x -= 1
-        elif self.orientation == RobotOrientation.RIGHT:
-            self.x += 1
-        elif self.orientation == RobotOrientation.BACK:
-            self.y -= 1
+        if self.orientation == RobotOrientation.FRONT or self.orientation == RobotOrientation.BACK:
+            counter = 0
+            for i in range(-1, 2):
+                if self.mapKnowledge[self.y + 2 * Direction.dy[self.orientation.value]][self.x + i] != GridState.EXPLORED_WITH_OBSTACLE:
+                    counter += 1
+            self.y += Direction.dy[self.orientation.value] if counter > 0 else 0
+        elif self.orientation == RobotOrientation.RIGHT or self.orientation == RobotOrientation.LEFT:
+            counter = 0
+            for i in range(-1, 2):
+                if self.mapKnowledge[self.y + i][self.x + 2 * Direction.dx[self.orientation.value]] != GridState.EXPLORED_WITH_OBSTACLE:
+                    counter += 1
+            self.x += Direction.dx[self.orientation.value] if counter > 0 else 0
 
     def moveBackward(self):
         if self.orientation == RobotOrientation.FRONT:
@@ -84,6 +92,14 @@ class Robot:
             self.orientation = RobotOrientation.BACK
         elif self.orientation == RobotOrientation.BACK:
             self.orientation = RobotOrientation.RIGHT
+
+    def do(self, action):
+        if action == Action.forward:
+            pass
+        elif action == Action.turn_left:
+            self.rotateLeft()
+        elif action == Action.turn_right:
+            self.rotateRight()
 
     # Returns the Grid position where it should be updated
     def readSensors(self, completeMap):

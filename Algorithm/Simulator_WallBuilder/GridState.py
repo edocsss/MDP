@@ -9,3 +9,5 @@ class GridState(Enum):
     START_ZONE = 4
     END_ZONE = 5
     END_ZONE_EXPLORED = 6
+
+    SEARCHED = 7

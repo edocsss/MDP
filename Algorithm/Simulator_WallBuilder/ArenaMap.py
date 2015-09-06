@@ -36,6 +36,9 @@ class ArenaMap:
                 self.gridMap[i][j].setGridState(GridState.START_ZONE)
                 self.gridMap[self.MAP_HEIGHT - i - 1][self.MAP_WIDTH - j - 1].setGridState(GridState.END_ZONE)
 
+    def __hash__(self):
+        return hash(''.join(''.join(map(str, row)) for row in self.gridMap))
+
     def getGridMap (self):
         return self.gridMap
 
@@ -44,6 +47,9 @@ class ArenaMap:
 
     def updateGrid (self, x, y, state):
         self.getGrid(x, y).setState(state)
+
+    def __getitem__(self, key):
+        return self.gridMap[key]
 
     def countExploredGrids(self):
         count = 0
