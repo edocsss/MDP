@@ -24,6 +24,7 @@ class Robot:
             Sensor.Sensor(SensorPosition.RIGHT_SENSOR, SensorRange.SHORT_SENSOR, (0, 1)),
             Sensor.Sensor(SensorPosition.RIGHT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1))
         ]
+
         self.mapKnowledge = initialMap
 
     def getPositionX(self):
@@ -43,6 +44,9 @@ class Robot:
 
     def setOrientation(self, orientation):
         self.orientation = orientation
+
+    def getMapKnowledge(self):
+        return self.mapKnowledge
 
     def moveForward(self):
         if self.orientation == RobotOrientation.FRONT:

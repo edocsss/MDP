@@ -1,5 +1,6 @@
 import tkinter
-import ArenaMap as ArenaMap
+import ArenaMap
+import MapDescriptor
 import threading
 import time
 from GridState import *
@@ -31,7 +32,7 @@ class MainUI(threading.Thread):
         self.arenaMap = arenaMap
         self.obstacleMap = obstacleMap
         self.robot = robot
-        self.robotSpeed = 0.1
+        self.robotSpeed = 0.5
         self.maxPercentage = 100.00
         self.maxTime = 1000.00 # In seconds
         self.startTime = time.time() # Any initial time --> does not really matter since the starting time will be overwritten in self.startExplore()
@@ -51,7 +52,16 @@ class MainUI(threading.Thread):
     def startExplorationWindow(self):
         self.canvas.delete("all")
         self.saveButton.destroy()
+        self.loadMapButton.destroy()
         self.openExplorationWindow()
+
+    def loadMapFromDisk(self):
+        # Local mapDescriptor for obstacle initialization purpose
+        mapDescriptor = MapDescriptor.MapDescriptor("MapDescriptor.in")
+
+        # Since obstacleMap is initially empty (because it is initially for WallBuilder purpose), now we have to populate using the translated map
+        self.obstacleMap.updateEntireMap(mapDescriptor.getTranslatedMap())
+        self.startExplorationWindow()
 
     def run(self):
         self.root = tkinter.Tk()
@@ -67,7 +77,10 @@ class MainUI(threading.Thread):
 
     def buildWall(self):
         self.saveButton = tkinter.Button(self.root, text="Save Obstacles!", command=self.startExplorationWindow)
-        self.saveButton.pack(ipadx=10, ipady=10, pady=20)
+        self.saveButton.pack(side=tkinter.LEFT, ipadx=10, ipady=10, padx=10, pady=20)
+
+        self.loadMapButton = tkinter.Button(self.root, text="Load Map!", command=self.loadMapFromDisk)
+        self.loadMapButton.pack(side=tkinter.LEFT, ipadx=10, ipady=10, pady=20)
 
         # Initialize rectangles
         for i in range (0, ArenaMap.ArenaMap.MAP_HEIGHT):
@@ -164,7 +177,6 @@ class MainUI(threading.Thread):
 
     def checkTimeout(self):
         now = time.time()
-        print(now, self.startTime, now - self.startTime)
         if (now - self.startTime) >= self.maxTime:
             return False
 
@@ -323,6 +335,7 @@ class MainUI(threading.Thread):
 
         # Draw the robot orientation
         robotOrientation = self.robot.getOrientation()
+        print(robotOrientation)
         if robotOrientation == RobotOrientation.FRONT:
             self.canvas.itemconfig(self.rectangles[self.robot.getPositionY() + 1][self.robot.getPositionX()], fill="#9FDDEC")
         elif robotOrientation == RobotOrientation.BACK:
@@ -330,4 +343,4 @@ class MainUI(threading.Thread):
         elif robotOrientation == RobotOrientation.LEFT:
             self.canvas.itemconfig(self.rectangles[self.robot.getPositionY()][self.robot.getPositionX() - 1], fill="#9FDDEC")
         elif robotOrientation == RobotOrientation.RIGHT:
-                self.canvas.itemconfig(self.rectangles[self.robot.getPositionY()][self.robot.getPositionX() + 1], fill="#9FDDEC")
+            self.canvas.itemconfig(self.rectangles[self.robot.getPositionY()][self.robot.getPositionX() + 1], fill="#9FDDEC")

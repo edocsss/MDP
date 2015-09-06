@@ -49,6 +49,9 @@ class Robot:
     def setOrientation(self, orientation):
         self.orientation = orientation
 
+    def getMapKnowledge(self):
+        return self.mapKnowledge
+
     def moveForward(self):
         if self.orientation == RobotOrientation.FRONT or self.orientation == RobotOrientation.BACK:
             counter = 0
@@ -91,7 +94,7 @@ class Robot:
         elif self.orientation == RobotOrientation.RIGHT:
             self.orientation = RobotOrientation.BACK
         elif self.orientation == RobotOrientation.BACK:
-            self.orientation = RobotOrientation.RIGHT
+            self.orientation = RobotOrientation.LEFT
 
     def do(self, action):
         if action == Action.forward:

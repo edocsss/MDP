@@ -1,10 +1,10 @@
 import Algorithm as Algorithm
-import ArenaMap as ArenaMap
-import MainUI as MainUI
-import Robot as Robot
-import WifiComm as WifiComm
-import RobotController as RobotController
-import WallBuilder as WallBuilder
+import ArenaMap
+import MainUI
+import Robot
+import WifiComm
+import RobotController
+import MapDescriptor
 import time
 
 __author__ = 'ECAND_000'
@@ -22,9 +22,9 @@ initialMap = ArenaMap.ArenaMap()
 
 # Other object initialization
 robot = Robot.Robot(initialMap)
-# wallBuilder = WallBuilder.WallBuilder(obstacleMap)
 algorithm = None
 wifiComm = WifiComm.WifiComm(host, port)
+mapDescriptor = MapDescriptor.MapDescriptor()
 ui = MainUI.MainUI(initialMap, obstacleMap, robot)
 robotController = RobotController.RobotController(obstacleMap, robot, algorithm, wifiComm, ui)
 
@@ -35,3 +35,6 @@ while ui.isStartExplore() == False:
 
 # When the EXPLORE button has been pressed, start exploration by initiating RobotController
 robotController.explore()
+
+# Once done, generate the Map Descriptor file based on the last Robot's Explored Map knowledge
+mapDescriptor.writeMapDescription(robot.getMapKnowledge())
