@@ -45,6 +45,9 @@ class Robot:
     def setOrientation(self, orientation):
         self.orientation = orientation
 
+    def getMapKnowledge(self):
+        return self.mapKnowledge
+
     def moveForward(self):
         if self.orientation == RobotOrientation.FRONT:
             self.y += 1
@@ -83,7 +86,7 @@ class Robot:
         elif self.orientation == RobotOrientation.RIGHT:
             self.orientation = RobotOrientation.BACK
         elif self.orientation == RobotOrientation.BACK:
-            self.orientation = RobotOrientation.RIGHT
+            self.orientation = RobotOrientation.LEFT
 
     # Returns the Grid position where it should be updated
     def readSensors(self, completeMap):

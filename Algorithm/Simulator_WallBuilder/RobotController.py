@@ -1,4 +1,4 @@
-import time
+import ArenaMap
 
 __author__ = 'ECAND_000'
 
@@ -22,7 +22,7 @@ class RobotController:
     def explore(self):
         i = 0
         while True:
-            if i == 17:
+            if i == 5:
                 break
 
             print("Reading sensors...")
@@ -38,7 +38,7 @@ class RobotController:
             if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
                 break
 
-            self.robot.moveForward()
+            self.robot.rotateRight()
             self.ui.drawRobot()
 
             i += 1
@@ -48,7 +48,6 @@ class RobotController:
         for n in updatedGrids:
             x, y = n[0], n[1]
             self.ui.drawGrid(x, y)
-
 
 
 
