@@ -28,13 +28,24 @@ class RobotController:
             # 'F', 'L', 'R'
             for action in actions:
                 # Read sensors reading from Arduino
-                sensorReading = self.wifiComm.read()
-                for reading in sensorReading:
-                    # DO SOMETHING WITH THE READING
-                    # WHAT TO DO DEPENDS ON HOW THE READING IS COMMUNICATED
-                    # UPDATE THE ROBOT'S MAP KNOWLEDGE USING THOSE READINGS
-                    # UPDATE THE UI USING THOSE READINGS
-                    pass
+                # sensorReading = self.wifiComm.read()
+                # for reading in sensorReading:
+                #     # DO SOMETHING WITH THE READING
+                #     # WHAT TO DO DEPENDS ON HOW THE READING IS COMMUNICATED
+                #     # UPDATE THE ROBOT'S MAP KNOWLEDGE USING THOSE READINGS
+                #     # UPDATE THE UI USING THOSE READINGS
+                #     pass
+
+                # Only update the UPDATED GRIDS, based on the sensor reading
+                updatedGrids = self.robot.readSensors(self.completeMap)
+                for n in updatedGrids:
+                    x, y = n[0], n[1]
+                    self.ui.drawGrid(x, y)
+
+                # This checking must be done here because if not, there will be one extra ROBOT drawing (including one moveForward())
+                # If the checking is done in ui.drawRobot(), the moveForward() cannot be prevented although the robot should have stopped already before moving forward
+                if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
+                    break
 
                 r = self.robot.do(action)
                 if r == False:
@@ -42,7 +53,7 @@ class RobotController:
 
                 # Send the action to the Arduino --> since if there is a break, that action is then not transferred
                 # Basically each action is tested using the simulator's robot first and the actual robot sensor readings
-                self.wifiComm.write(r)
+                # self.wifiComm.write(r)
                 self.ui.drawRobot()
 
         end = time.time()

@@ -4,7 +4,6 @@ from RobotOrientation import *
 from GridState import *
 from SensorPosition import *
 from SensorRange import *
-from Action import *
 from Direction import *
 
 __author__ = 'ECAND_000'

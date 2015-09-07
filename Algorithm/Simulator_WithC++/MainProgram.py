@@ -1,4 +1,3 @@
-import Algorithm as Algorithm
 import ArenaMap
 import MainUI
 import Robot
