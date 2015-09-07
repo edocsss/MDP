@@ -413,7 +413,8 @@ int west_east(const State &state) {
 	for(int r = 1; r <= N_rows; ++r)
 		for(int c = 1; c <= N_cols; ++c)
 			if(temp -> maze[r][c] == '?')
-				value += -288 + 16 * c;
+//				value += -288 + 16 * c;
+				value += -(1 << (21 - c));
 	
 	return value;
 }
