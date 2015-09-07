@@ -354,13 +354,27 @@ shared_ptr<list<Action>> A_star(const State &current) {
 }
 
 int main(int argc, char * argv[]) {
-	system("cls");
-	
 	int start_x = atol(argv[1]),
 		start_y = atol(argv[2]),
-		start_dir = atol(argv[3]);
+		start_dir;
 	
-	State start(new Robot(start_x - 1, start_y - 1, start_dir, argv[4]));
+	switch(atol(argv[3])) {
+		case 0:
+			start_dir = 1;
+			break;
+		case 1:
+			start_dir = 0;
+			break;
+		case 2:
+			start_dir = 3;
+			break;
+		case 3:
+			start_dir = 2;
+			break;
+	}
+	
+	State start(new Robot(start_x, start_y, start_dir, argv[4]));
+	start.bot -> weak_update(); // ???
 //	print(start);
 	
 	shared_ptr<list<Action>> actions = A_star(start);
@@ -370,16 +384,14 @@ int main(int argc, char * argv[]) {
 				printf("F");
 				break;
 			case TURN_LEFT:
-				printf("L");
+				printf("R");
 				break;
 			case TURN_RIGHT:
-				printf("R");
+				printf("L");
 				break;
 		}
 		actions -> pop_back();
 	} puts("");
-	
-	this_thread::sleep_for(chrono::seconds(1));
 	
 	return 0;
 }
