@@ -5,6 +5,12 @@ import subprocess
 __author__ = 'ECAND_000'
 
 class RobotController:
+    arenaMap = None
+    robot = None
+    algorithm = None
+    wifiComm = None
+    ui = None
+
     def __init__(self, completeMap, robot, algorithm, wifiComm, ui):
         # Needed for sensor reading
         self.completeMap = completeMap
@@ -17,9 +23,18 @@ class RobotController:
 
     def explore(self):
         start = time.time()
-
-        # Probably before going into the loop, tell the robot to do self adjustment
         while True:
+            # Only update the UPDATED GRIDS, based on the sensor reading
+            updatedGrids = self.robot.readSensors(self.completeMap)
+            for n in updatedGrids:
+                x, y = n[0], n[1]
+                self.ui.drawGrid(x, y)
+
+            # This checking must be done here because if not, there will be one extra ROBOT drawing (including one moveForward())
+            # If the checking is done in ui.drawRobot(), the moveForward() cannot be prevented although the robot should have stopped already before moving forward
+            if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
+                break
+
             # Data sent --> (x, y, orientation, mapKnowledge)
             actions = subprocess.Popen(["algorithm", self.robot.x, self.robot.y, self.robot.orientation.value, self.robot.mapKnowledge.translate()], stdout=subprocess.PIPE).communicate()[0]
 
@@ -27,30 +42,21 @@ class RobotController:
             # Format:
             # 'F', 'L', 'R'
             for action in actions:
-                # Read sensors reading from Arduino
-                sensorReading = self.wifiComm.read()
-                for reading in sensorReading:
-                    # DO SOMETHING WITH THE READING
-                    # WHAT TO DO DEPENDS ON HOW THE READING IS COMMUNICATED
-                    # UPDATE THE ROBOT'S MAP KNOWLEDGE USING THOSE READINGS
-                    # UPDATE THE UI USING THOSE READINGS
-                    pass
-
                 r = self.robot.do(action)
                 if r == False:
                     break
 
-                # Send the action to the Arduino --> since if there is a break, that action is then not transferred
-                # Basically each action is tested using the simulator's robot first and the actual robot sensor readings
-                self.wifiComm.write(r)
                 self.ui.drawRobot()
+                # Only update the UPDATED GRIDS, based on the sensor reading
+                updatedGrids = self.robot.readSensors(self.completeMap)
+                for n in updatedGrids:
+                    x, y = n[0], n[1]
+                    self.ui.drawGrid(x, y)
 
         end = time.time()
         print("RUNNING TIME:", end - start)
-        print("Robot exploration done!")
-        print("Going back to start zone...")
 
-        # RUN FASTEST PATH ALGORITHM HERE TO GO BACK TO (1,1) --> ROBOT'S CENTRAL POSITION
+
 
 
         # PROBABLY USE A BLOCKING WI-FI READING SINCE THERE IS NO POINT IN CONTINUING THE WHILE LOOP IF THERE IS NO INCOMING DATA!!
@@ -68,12 +74,3 @@ class RobotController:
         #           --> if not, BREAK, then go to the next loop of the WHILE LOOP (search for bunch of moves based on the sensor readings just now)
         #
         #       Remove the move!! (by list.pop(0))
-
-
-    def fastestPathRun(self):
-        print("Running fastest path algorithm...")
-
-        # Probably before going into the loop, tell the robot to do self adjustment
-        # The algorithm runs once and only once
-        # The algorithm must return a bunch of actions from the Start zone to the End Zone all at once
-        return
