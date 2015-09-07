@@ -79,3 +79,24 @@ class ArenaMap:
 
     def getPercentageExploredGrids(self):
         return 100 * self.countExploredGrids() / (self.MAP_HEIGHT * self.MAP_WIDTH)
+
+    def translate(self):
+        r = ""
+
+        # Format
+        # 0 = NOT EXPLORED
+        # 1 = EXPLORED NO OBSTACLE
+        # 2 = EXPLORED WITH OBSTACLE
+        for m in range (0, self.MAP_HEIGHT):
+            for n in range (0,self.MAP_WIDTH):
+                if self.gridMap[m][n].state == GridState.UNEXPLORED \
+                        or self.gridMap[m][n].state == GridState.END_ZONE:
+                    r += "0"
+                elif self.gridMap[m][n].state == GridState.EXPLORED_NO_OBSTACLE\
+                        or self.gridMap[m][n].state == GridState.START_ZONE\
+                        or self.gridMap[m][n].state == GridState.END_ZONE_EXPLORED:
+                    r += "1"
+                elif self.gridMap[m][n].state == GridState.EXPLORED_WITH_OBSTACLE:
+                    r += "2"
+
+        return r
