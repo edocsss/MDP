@@ -38,7 +38,10 @@ char real_maze[N_rows + 2][N_cols + 3] = {
 };
 
 const int transition = -1; // cost
+
+const int bot_sight = 3;
 const int bot_length = 3;
+
 const int dr[4] = {0, 1, 0, -1}, dc[4] = {1, 0, -1, 0};
 
 bool in_range(const int &a, const int &b, const int &c) { return a <= b && b <= c; }
@@ -166,19 +169,126 @@ struct Robot {
 	
 	void weak_update() {
 		// near sighted
-		Position front;
+//		Position front;
+//		switch(dir) {
+//			case 0: case 2:
+//				front = pos.get(dir, dir == 0 ? bot_length : 1);
+//				for(int i = 0; i < bot_length; ++i)
+//					if(mem.maze[front.y + i][front.x] == '?')
+//						mem.maze[front.y + i][front.x] = 'o';
+//				break;
+//			case 1: case 3:
+//				front = pos.get(dir, dir == 1 ? bot_length : 1);
+//				for(int i = 0; i < bot_length; ++i)
+//					if(mem.maze[front.y][front.x + i] == '?')
+//						mem.maze[front.y][front.x + i] = 'o';
+//				break;
+//		}
+		
 		switch(dir) {
-			case 0: case 2:
-				front = pos.get(dir, dir == 0 ? bot_length : 1);
-				for(int i = 0; i < bot_length; ++i)
-					if(mem.maze[front.y + i][front.x] == '?')
-						mem.maze[front.y + i][front.x] = 'o';
+			case 0:
+				// EAST
+				for(int i = 0; i < 3; ++i) {
+					Position front = pos.get(dir, bot_length);
+					
+					front.y += i;
+					for(int k = 0; k < bot_sight; ++k) {
+						if(mem.maze[front.y][front.x] == '#') break;
+						else if(mem.maze[front.y][front.x] == '?')
+							mem.maze[front.y][front.x] = 'o';
+						front = front.get(dir);
+					}
+				}
+				// NORTH
+				for(int i = 0; i < 3; ++i) {
+					Position front = pos.get(1, bot_length);
+					
+					front.x += i;
+					for(int k = 0; k < 3; ++k) {
+						if(mem.maze[front.y][front.x] == '#') break;
+						else if(mem.maze[front.y][front.x] == '?')
+							mem.maze[front.y][front.x] = 'o';
+						front = front.get(1);
+					}
+				}
 				break;
-			case 1: case 3:
-				front = pos.get(dir, dir == 1 ? bot_length : 1);
-				for(int i = 0; i < bot_length; ++i)
-					if(mem.maze[front.y][front.x + i] == '?')
-						mem.maze[front.y][front.x + i] = 'o';
+			case 1:
+				// NORTH
+				for(int i = 0; i < 3; ++i) {
+					Position front = pos.get(dir, bot_length);
+					
+					front.x += i;
+					for(int k = 0; k < 3; ++k) {
+						if(mem.maze[front.y][front.x] == '#') break;
+						else if(mem.maze[front.y][front.x] == '?')
+							mem.maze[front.y][front.x] = 'o';
+						front = front.get(dir);
+					}
+				}
+				// WEST
+				for(int i = 0; i < 3; ++i) {
+					Position front = pos.get(2);
+					
+					front.y += i;
+					for(int k = 0; k < bot_sight; ++k) {
+						if(mem.maze[front.y][front.x] == '#') break;
+						else if(mem.maze[front.y][front.x] == '?')
+							mem.maze[front.y][front.x] = 'o';
+						front = front.get(2);
+					}
+				}
+				break;
+			case 2:
+				// WEST
+				for(int i = 0; i < 3; ++i) {
+					Position front = pos.get(dir);
+					
+					front.y += i;
+					for(int k = 0; k < bot_sight; ++k) {
+						if(mem.maze[front.y][front.x] == '#') break;
+						else if(mem.maze[front.y][front.x] == '?')
+							mem.maze[front.y][front.x] = 'o';
+						front = front.get(dir);
+					}
+				}
+				// SOUTH
+				for(int i = 0; i < 3; ++i) {
+					Position front = pos.get(3);
+					
+					front.x += i;
+					for(int k = 0; k < bot_sight; ++k) {
+						if(mem.maze[front.y][front.x] == '#') break;
+						else if(mem.maze[front.y][front.x] == '?')
+							mem.maze[front.y][front.x] = 'o';
+						front = front.get(3);
+					}
+				}
+				break;
+			case 3:
+				// SOUTH
+				for(int i = 0; i < 3; ++i) {
+					Position front = pos.get(dir);
+					
+					front.x += i;
+					for(int k = 0; k < bot_sight; ++k) {
+						if(mem.maze[front.y][front.x] == '#') break;
+						else if(mem.maze[front.y][front.x] == '?')
+							mem.maze[front.y][front.x] = 'o';
+						front = front.get(dir);
+					}
+				}
+				// EAST
+				for(int i = 0; i < 3; ++i) {
+					Position front = pos.get(0, bot_length);
+					
+					front.y += i;
+					for(int k = 0; k < bot_sight; ++k) {
+						if(mem.maze[front.y][front.x] == '#') break;
+						else if(mem.maze[front.y][front.x] == '?')
+							mem.maze[front.y][front.x] = 'o';
+						front = front.get(0);
+					}
+				}
 				break;
 		}
 	}
@@ -206,10 +316,10 @@ struct Robot {
 				return copy;
 				
 			case TURN_LEFT:
-				copy -> dir = (copy -> dir + 3) % 4;
+				copy -> dir = (copy -> dir + 1) % 4;
 				return copy;
 			case TURN_RIGHT:
-				copy -> dir = (copy -> dir + 1) % 4;
+				copy -> dir = (copy -> dir + 3) % 4;
 				return copy;
 		}
 		return nullptr;
@@ -375,7 +485,6 @@ int main(int argc, char * argv[]) {
 	
 	State start(new Robot(start_x, start_y, start_dir, argv[4]));
 	start.bot -> weak_update(); // ???
-//	print(start);
 	
 	shared_ptr<list<Action>> actions = A_star(start);
 	while(!actions -> empty()) {
@@ -384,10 +493,10 @@ int main(int argc, char * argv[]) {
 				printf("F");
 				break;
 			case TURN_LEFT:
-				printf("R");
+				printf("L");
 				break;
 			case TURN_RIGHT:
-				printf("L");
+				printf("R");
 				break;
 		}
 		actions -> pop_back();
