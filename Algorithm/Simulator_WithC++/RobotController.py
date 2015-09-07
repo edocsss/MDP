@@ -1,7 +1,6 @@
 import copy
 import time
-from Algorithm import Algorithm
-from State import State
+import subprocess
 
 __author__ = 'ECAND_000'
 
@@ -36,9 +35,12 @@ class RobotController:
             if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
                 break
 
-            initialState = State(copy.deepcopy(self.robot))
-            actions = Algorithm.A_star(initialState)
+            # Data sent --> (x, y, orientation, mapKnowledge)
+            actions = subprocess.Popen(["algorithm", self.robot.x, self.robot.y, self.robot.orientation.value, self.robot.mapKnowledge.translate()], stdout=subprocess.PIPE).communicate()[0]
 
+            # actions --> String from CPP
+            # Format:
+            # 'F', 'L', 'R'
             for action in actions:
                 r = self.robot.do(action)
                 if r == False:

@@ -115,11 +115,11 @@ class Robot:
             self.orientation = RobotOrientation.LEFT
 
     def do(self, action):
-        if action == Action.forward:
+        if action == 'F':
             return self.moveForward()
-        elif action == Action.turn_left:
+        elif action == 'L':
             self.rotateLeft()
-        elif action == Action.turn_right:
+        elif action == 'R':
             self.rotateRight()
 
     # Returns the Grid position where it should be updated

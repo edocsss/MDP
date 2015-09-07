@@ -1,3 +1,4 @@
+import queue
 from ArenaMap import *
 
 class Algorithm:
@@ -10,21 +11,23 @@ class Algorithm:
         for i in range(ArenaMap.MAP_HEIGHT):
             for j in range(ArenaMap.MAP_WIDTH):
                 if state.robot.mapKnowledge[i][j] == GridState.UNEXPLORED or state.robot.mapKnowledge[i][j] == GridState.END_ZONE:
-                    value = 288 - 16 * (j + 1)
-        return value      
+                    value += 288 - 16 * (j + 1)
+
+        return value
     
     @staticmethod
     def A_star(start_state):
         # min heap
-        pq = Queue.PriorityQueue()
+        pq = queue.PriorityQueue()
 
         # (f(state), state)
-        pq.push((0, start_state))
+        pq.put((0, start_state))
 
         # state -> (g(state), prev_state, prev_action)
         visited = { start_state: (0, None, None) }
 
         goal_state = None
+        transition_cost = 1
         while not pq.empty():
             f, current_state = pq.get()
             current_cost = visited[current_state][0]
@@ -32,11 +35,12 @@ class Algorithm:
             if(current_state.isTerminal()):
                 goal_state = current_state
                 break
-            
+
             for next_action, child_state in current_state.getChildren():
                 if child_state not in visited:
+                    h = Algorithm.heuristicFunction(child_state)
                     visited[child_state] = (current_cost + transition_cost, current_state, next_action)
-                    pq.put((current_cost + transition_cost + Algorithm.heuristicFunction(child_state), child_state))
+                    pq.put((current_cost + transition_cost + h, child_state))
 
         result = []
         v = goal_state
