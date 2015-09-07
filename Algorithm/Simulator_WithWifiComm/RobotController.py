@@ -36,7 +36,7 @@ class RobotController:
                 break
 
             # Data sent --> (x, y, orientation, mapKnowledge)
-            actions = subprocess.Popen(["algorithm", self.robot.x, self.robot.y, self.robot.orientation.value, self.robot.mapKnowledge.translate()], stdout=subprocess.PIPE).communicate()[0]
+            actions = subprocess.Popen(["algorithm", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translate()], stdout=subprocess.PIPE).communicate()[0]
 
             # actions --> String from CPP
             # Format:

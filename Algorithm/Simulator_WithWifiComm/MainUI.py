@@ -49,12 +49,6 @@ class MainUI(threading.Thread):
         # Start timer
         self.startTime = time.time()
 
-    def startExplorationWindow(self):
-        self.canvas.delete("all")
-        self.saveButton.destroy()
-        self.loadMapButton.destroy()
-        self.openExplorationWindow()
-
     def loadMapFromDisk(self):
         # Local mapDescriptor for obstacle initialization purpose
         mapDescriptor = MapDescriptor.MapDescriptor("MapDescriptor.in")
@@ -72,27 +66,8 @@ class MainUI(threading.Thread):
         self.canvas.pack()
 
         # Define Maze
-        self.buildWall()
+        self.openExplorationWindow()
         self.root.mainloop()
-
-    def buildWall(self):
-        self.saveButton = tkinter.Button(self.root, text="Save Obstacles!", command=self.startExplorationWindow)
-        self.saveButton.pack(side=tkinter.LEFT, ipadx=10, ipady=10, padx=10, pady=20)
-
-        self.loadMapButton = tkinter.Button(self.root, text="Load Map!", command=self.loadMapFromDisk)
-        self.loadMapButton.pack(side=tkinter.LEFT, ipadx=10, ipady=10, pady=20)
-
-        # Initialize rectangles
-        for i in range (0, ArenaMap.ArenaMap.MAP_HEIGHT):
-            for j in range (0, ArenaMap.ArenaMap.MAP_WIDTH):
-                self.obstacleRectangles[i][j] = self.canvas.create_rectangle(self.MARGIN_LEFT+ j * self.GRID_EDGE_SIZE,
-                                                                     self.GRID_BOTTOM_MOST - i * self.GRID_EDGE_SIZE,
-                                                                     self.MARGIN_LEFT + j * self.GRID_EDGE_SIZE + self.GRID_EDGE_SIZE,
-                                                                     self.GRID_BOTTOM_MOST - i * self.GRID_EDGE_SIZE - self.GRID_EDGE_SIZE,
-                                                                     outline="#000000",
-                                                                     fill="#FFFFFF")
-
-                self.canvas.tag_bind(self.obstacleRectangles[i][j], '<ButtonPress-1>', self.onGridClick)
 
     def openExplorationWindow(self):
         # Add Textbox for X moves / second here --> user selects X
@@ -132,20 +107,6 @@ class MainUI(threading.Thread):
                                                                      fill="#DDDDDD")
 
         self.draw()
-
-    def onGridClick(self, event):
-        mouseX = event.x
-        mouseY = event.y
-
-        posX = int((mouseX - self.MARGIN_LEFT) / self.GRID_EDGE_SIZE)
-        posY = int((self.GRID_BOTTOM_MOST - mouseY) / self.GRID_EDGE_SIZE)
-
-        if self.obstacleMap.getGridMap()[posY][posX].getGridState() == GridState.UNEXPLORED:
-            self.obstacleMap.getGridMap()[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
-        elif self.obstacleMap.getGridMap()[posY][posX].getGridState() == GridState.EXPLORED_WITH_OBSTACLE:
-            self.obstacleMap.getGridMap()[posY][posX].setGridState(GridState.UNEXPLORED)
-
-        self.drawObstacleGrid(posX, posY)
 
     def isStartExplore(self):
         return self.startExploration
