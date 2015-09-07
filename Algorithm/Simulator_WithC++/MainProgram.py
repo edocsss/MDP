@@ -33,7 +33,7 @@ while ui.isStartExplore() == False:
     time.sleep(0.2)
 
 # When the EXPLORE button has been pressed, start exploration by initiating RobotController
-robotController.explore()
+robotController.explore()   
 
 # Once done, generate the Map Descriptor file based on the last Robot's Explored Map knowledge
 mapDescriptor.writeMapDescription(robot.getMapKnowledge())

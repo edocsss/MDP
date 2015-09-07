@@ -21,7 +21,7 @@ class RobotController:
         # Probably before going into the loop, tell the robot to do self adjustment
         while True:
             # Data sent --> (x, y, orientation, mapKnowledge)
-            actions = subprocess.Popen(["algorithm", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translate()], stdout=subprocess.PIPE).communicate()[0]
+            actions = subprocess.Popen(["demo", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translate()], stdout=subprocess.PIPE).communicate()[0]
 
             # actions --> String from CPP
             # Format:
