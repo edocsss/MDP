@@ -162,12 +162,12 @@ class MainUI(threading.Thread):
 
     def setMapPercentage(self):
         currentPercentage = self.arenaMap.getPercentageExploredGrids()
+        self.percentageLabel["text"] = "{:.2f}%".format(self.arenaMap.getPercentageExploredGrids())
 
         # Stop whenever the current percentage is reached
         if currentPercentage >= self.maxPercentage:
             return False
 
-        self.percentageLabel["text"] = "{:.2f}%".format(self.arenaMap.getPercentageExploredGrids())
         return True
 
     def setTimeout(self):

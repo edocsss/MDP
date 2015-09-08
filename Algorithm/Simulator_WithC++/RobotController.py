@@ -54,6 +54,9 @@ class RobotController:
                 # self.wifiComm.write(r)
                 self.ui.drawRobot()
 
+        # Last percentage update
+        self.ui.setMapPercentage()
+
         end = time.time()
         print("RUNNING TIME:", end - start)
         print("Robot exploration done!")
