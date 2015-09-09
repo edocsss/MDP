@@ -43,6 +43,12 @@ class WifiComm:
         while c != '\n':
             # This is a blocking READ operation
             # USE BLOCKING SINCE WE NEED TO READ THE WHOLE SENSOR READING BEFORE PROCEEDING WITH THE ALGORITHM EXECUTION
+
+            # This part --> understands that the laptop just did a reconnection and hence need to discard the whole message read before
+            if c == 'T':
+                data = ""
+                continue
+
             c = self.soc.recv(1).decode()
             data += c
 
