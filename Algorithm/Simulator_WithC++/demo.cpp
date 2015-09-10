@@ -171,23 +171,6 @@ struct Robot {
 	}
 	
 	void weak_update() {
-		// near sighted
-//		Position front;
-//		switch(dir) {
-//			case 0: case 2:
-//				front = pos.get(dir, dir == 0 ? bot_length : 1);
-//				for(int i = 0; i < bot_length; ++i)
-//					if(mem.maze[front.y + i][front.x] == '?')
-//						mem.maze[front.y + i][front.x] = 'o';
-//				break;
-//			case 1: case 3:
-//				front = pos.get(dir, dir == 1 ? bot_length : 1);
-//				for(int i = 0; i < bot_length; ++i)
-//					if(mem.maze[front.y][front.x + i] == '?')
-//						mem.maze[front.y][front.x + i] = 'o';
-//				break;
-//		}
-		
 		switch(dir) {
 			case 0:
 				// EAST
@@ -460,52 +443,123 @@ shared_ptr<list<Action>> A_star(const State &current) {
 		tuple<int, shared_ptr<State>, Action> _ = visited[*v];
 		shared_ptr<State> prev = get<1>(_);
 		Action action = get<2>(_);
-		backtrack -> push_back(action);
+		backtrack -> push_front(action);
 		v = prev;
 	}
 	
 	return backtrack;
 }
 
-int main(int argc, char * argv[]) {
-	int start_x = atol(argv[1]),
-		start_y = atol(argv[2]),
-		start_dir;
+shared_ptr<list<Action>> dijkstra(const State &state, const int &goal_x, const int &goal_y) {
+	shared_ptr<State> start_state(new State(state)), goal_state = nullptr;
+	priority_queue<pair<int, shared_ptr<State>>> pq;
 	
-	switch(atol(argv[3])) {
-		case 0:
-			start_dir = 1;
+	pq.push(make_pair(0, shared_ptr<State>(start_state)));
+	
+	map<State, tuple<int, shared_ptr<State>, Action>> visited;
+	visited[state] = make_tuple(0, nullptr, FORWARD);
+	
+	while(!pq.empty()) {
+		pair<int, shared_ptr<State>> _ = pq.top();
+		pq.pop();
+		
+		int current_cost = _.first;
+		shared_ptr<State> current_state = _.second;
+		
+		if(current_state -> bot -> pos.x == goal_x && current_state -> bot -> pos.y == goal_y) {
+			goal_state = current_state;
 			break;
-		case 1:
-			start_dir = 0;
-			break;
-		case 2:
-			start_dir = 3;
-			break;
-		case 3:
-			start_dir = 2;
-			break;
+		}
+		
+		shared_ptr<list<tuple<Action, shared_ptr<State> > > > children = current_state -> get_children();
+		for(tuple<Action, shared_ptr<State>> el: *children) {
+			Action action = get<0>(el);
+			shared_ptr<State> next_state = get<1>(el);
+			
+			if(visited.find(*next_state) == visited.end()) {
+				visited[*next_state] = make_tuple(current_cost + transition, current_state, action);
+				pq.push(make_pair(current_cost + transition, next_state));
+			}
+		}
 	}
 	
-	State start(new Robot(start_x, start_y, start_dir, argv[4]));
-	start.bot -> weak_update(); // ???
+	shared_ptr<list<Action>> backtrack(new list<Action>());
+	shared_ptr<State> v(goal_state);
+	while(*v != *start_state) {
+		tuple<int, shared_ptr<State>, Action> _ = visited[*v];
+		shared_ptr<State> u = get<1>(_);
+		Action action = get<2>(_);
+		backtrack -> push_front(action);
+		v = u;
+	}
 	
-	shared_ptr<list<Action>> actions = A_star(start);
-	while(!actions -> empty()) {
-		switch(actions -> back()) {
-			case FORWARD:
-				printf("F");
+	return backtrack;
+}
+
+int main(int argc, char * argv[]) {
+	// read from args
+	if(argc >= 5) {
+		int start_x = atol(argv[1]),
+			start_y = atol(argv[2]),
+			start_dir;
+		
+		switch(atol(argv[3])) {
+			case 0:
+				start_dir = 1;
 				break;
-			case TURN_LEFT:
-				printf("L");
+			case 1:
+				start_dir = 0;
 				break;
-			case TURN_RIGHT:
-				printf("R");
+			case 2:
+				start_dir = 3;
+				break;
+			case 3:
+				start_dir = 2;
 				break;
 		}
-		actions -> pop_back();
-	} puts("");
-	
+		
+		State start(new Robot(start_x, start_y, start_dir, argv[4]));
+		start.bot -> weak_update(); // ???
+		
+		if(argc == 7) {
+			goal_x = atol(argv[5]);
+			goal_y = atol(argv[6]);
+			
+			shared_ptr<list<Action>> actions = dijkstra(start, goal_x, goal_y);
+			while(!actions -> empty()) {
+				switch(actions -> front()) {
+					case FORWARD:
+						printf("F");
+						break;
+					case TURN_LEFT:
+						printf("L");
+						break;
+					case TURN_RIGHT:
+						printf("R");
+						break;
+				}
+				actions -> pop_front();
+			} puts("");
+			
+		} else {
+			shared_ptr<list<Action>> actions = A_star(start);
+			while(!actions -> empty()) {
+				switch(actions -> front()) {
+					case FORWARD:
+						printf("F");
+						break;
+					case TURN_LEFT:
+						printf("L");
+						break;
+					case TURN_RIGHT:
+						printf("R");
+						break;
+				}
+				actions -> pop_front();
+			} puts("");
+		}
+	}
+
 	return 0;
 }
 
