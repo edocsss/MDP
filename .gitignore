@@ -1,2 +1,4 @@
 __pycache__/
 Algorithm/.idea/
+**/.idea/
+*.exe
