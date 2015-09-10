@@ -7,12 +7,14 @@
 #include <map>
 #include <windows.h>
 #include <iostream>
+#include <cstring>
 
 using namespace std;
 
 const int N_rows = 20, N_cols = 15;
+const int Real_rows = 22, Real_cols = 17;
 
-char real_maze[N_rows + 2][N_cols + 3] = {
+char real_maze[Real_rows][Real_cols + 1]{
 	"#################",
 	"#.......###.....#",
 	"#...............#",
@@ -43,6 +45,8 @@ const int bot_sight = 3;
 const int bot_length = 3;
 
 const int dr[4] = {0, 1, 0, -1}, dc[4] = {1, 0, -1, 0};
+
+int goal_x, goal_y;
 
 bool in_range(const int &a, const int &b, const int &c) { return a <= b && b <= c; }
 
@@ -91,30 +95,28 @@ struct Knowledge {
 	}
 	
 	bool operator < (const Knowledge &other) const {
-		for(int i = 1; i <= N_rows; ++i)
-			for(int j = 1; j <= N_cols; ++j)
-				if(maze[i][j] != '?' && other.maze[i][j] == '?') return true;
-				else if(maze[i][j] == '?' && other.maze[i][j] != '?') return false;
+		for(int i = 1; i <= N_rows; ++i) {
+			int cmp = memcmp(maze[i] + 1, other.maze[i] + 1, N_cols);
+			if(cmp < 0) return true;
+			else if(cmp > 0) return false;
+		}
 		return false;
 	}
 	
 	bool operator != (const Knowledge &other) const {
-		for(int i = 1; i <= N_rows; ++i)
-			for(int j = 1; j <= N_cols; ++j)
-				if(maze[i][j] != '?' && other.maze[i][j] == '?') return true;
-				else if(maze[i][j] == '?' && other.maze[i][j] != '?') return true;
+		for(int i = 1; i <= N_rows; ++i) {
+			int cmp = memcmp(maze[i] + 1, other.maze[i] + 1, N_cols);
+			if(cmp != 0) return true;
+		}
 		return false;
 	}
 	
 	bool operator == (const Knowledge &other) const {
-		int left = 0, right = 0, matched = 0;
-		for(int i = 1; i <= N_rows; ++i)
-			for(int j = 1; j <= N_cols; ++j) {
-				if(maze[i][j] == '?') ++left;
-				if(other.maze[i][j] == '?') ++right;
-				if(maze[i][j] == '?' && maze[i][j] == other.maze[i][j]) ++matched;
-			}
-		return left == matched && left == right;
+		for(int i = 1; i <= N_rows; ++i) {
+			int cmp = memcmp(maze[i] + 1, other.maze[i] + 1, N_cols);
+			if(cmp != 0) return false;
+		}
+		return true;
 	}
 	
 	int count() {
@@ -144,6 +146,7 @@ struct Robot {
 	bool operator == (const Robot &other) const { return pos == other.pos && dir == other.dir && mem == other.mem; }
 	bool operator != (const Robot &other) const { return dir != other.dir || pos != other.pos || mem != other.mem; }
 	
+	// OUTDATED
 	void update() {
 		for(int i = 0; i < bot_length; ++i)
 			for(int j = 0; j < bot_length; ++j)
