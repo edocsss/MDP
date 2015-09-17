@@ -190,7 +190,7 @@ struct Robot {
 					Position front = pos.get(1, bot_length);
 					
 					front.x += i;
-					for(int k = 0; k < 3; ++k) {
+					for(int k = 0; k < bot_sight; ++k) {
 						if(mem.maze[front.y][front.x] == '#') break;
 						else if(mem.maze[front.y][front.x] == '?')
 							mem.maze[front.y][front.x] = 'o';
@@ -204,7 +204,7 @@ struct Robot {
 					Position front = pos.get(dir, bot_length);
 					
 					front.x += i;
-					for(int k = 0; k < 3; ++k) {
+					for(int k = 0; k < bot_sight; ++k) {
 						if(mem.maze[front.y][front.x] == '#') break;
 						else if(mem.maze[front.y][front.x] == '?')
 							mem.maze[front.y][front.x] = 'o';
