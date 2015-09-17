@@ -36,12 +36,12 @@ char real_maze[Real_rows][Real_cols + 1]{
 	"##...##...##....#",
 	"#...............#",
 	"#...............#",
-	"#################",
+	"#################"
 };
 
 const int transition = -1; // cost
 
-const int bot_sight = 3;
+const int bot_sight = 2;
 const int bot_length = 3;
 
 const int dr[4] = {0, 1, 0, -1}, dc[4] = {1, 0, -1, 0};
@@ -186,7 +186,7 @@ struct Robot {
 					}
 				}
 				// NORTH
-				for(int i = 0; i < 3; ++i) {
+				for(int i = 0; i < 3; i += 2) {
 					Position front = pos.get(1, bot_length);
 					
 					front.x += i;
@@ -212,7 +212,7 @@ struct Robot {
 					}
 				}
 				// WEST
-				for(int i = 0; i < 3; ++i) {
+				for(int i = 0; i < 3; i += 2) {
 					Position front = pos.get(2);
 					
 					front.y += i;
@@ -238,7 +238,7 @@ struct Robot {
 					}
 				}
 				// SOUTH
-				for(int i = 0; i < 3; ++i) {
+				for(int i = 0; i < 3; i += 2) {
 					Position front = pos.get(3);
 					
 					front.x += i;
@@ -264,7 +264,7 @@ struct Robot {
 					}
 				}
 				// EAST
-				for(int i = 0; i < 3; ++i) {
+				for(int i = 0; i < 3; i += 2) {
 					Position front = pos.get(0, bot_length);
 					
 					front.y += i;
