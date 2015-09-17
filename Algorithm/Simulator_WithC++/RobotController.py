@@ -1,6 +1,7 @@
 import copy
 import time
 import subprocess
+from ArenaMap import *
 
 __author__ = 'ECAND_000'
 
@@ -54,16 +55,29 @@ class RobotController:
                 # self.wifiComm.write(r)
                 self.ui.drawRobot()
 
+        # Last sensor reading & update
+        # Only update the UPDATED GRIDS, based on the sensor reading
+        updatedGrids = self.robot.readSensors(self.completeMap)
+        for n in updatedGrids:
+            x, y = n[0], n[1]
+            self.ui.drawGrid(x, y)
+
         # Last percentage update
         self.ui.setMapPercentage()
 
         end = time.time()
         print("RUNNING TIME:", end - start)
         print("Robot exploration done!")
-        print("Going back to start zone...")
+
+        # RUN FASTEST PATH ALGORITHM HERE TO END ZONE (ArenaMap.MAP_WIDTH - 1, ArenaMap.MAP_HEIGHT - 1)
+        time.sleep(0.1)
+        print("Going to end zone...")
+        self.fastestPathRun(ArenaMap.MAP_WIDTH - 2, ArenaMap.MAP_HEIGHT - 2)
 
         # RUN FASTEST PATH ALGORITHM HERE TO GO BACK TO (1,1) --> ROBOT'S CENTRAL POSITION
-
+        time.sleep(0.1)
+        print("Going back to start zone...")
+        self.fastestPathRun(1, 1)
 
         # PROBABLY USE A BLOCKING WI-FI READING SINCE THERE IS NO POINT IN CONTINUING THE WHILE LOOP IF THERE IS NO INCOMING DATA!!
         #
@@ -82,8 +96,13 @@ class RobotController:
         #       Remove the move!! (by list.pop(0))
 
 
-    def fastestPathRun(self):
+    def fastestPathRun(self, targetX, targetY):
         print("Running fastest path algorithm...")
+
+        actions = subprocess.Popen(["demo", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translate(), str(targetX), str(targetY)], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+        for action in actions:
+            self.robot.do(action)
+            self.ui.drawRobot()
 
         # Probably before going into the loop, tell the robot to do self adjustment
         # The algorithm runs once and only once

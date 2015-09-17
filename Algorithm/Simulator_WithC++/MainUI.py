@@ -32,7 +32,7 @@ class MainUI(threading.Thread):
         self.arenaMap = arenaMap
         self.obstacleMap = obstacleMap
         self.robot = robot
-        self.robotSpeed = 0.05
+        self.robotSpeed = 0.2
         self.maxPercentage = 100.00
         self.maxTime = 1000.00 # In seconds
         self.startTime = time.time() # Any initial time --> does not really matter since the starting time will be overwritten in self.startExplore()

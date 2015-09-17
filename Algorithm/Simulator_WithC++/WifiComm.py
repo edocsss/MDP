@@ -33,10 +33,23 @@ class WifiComm:
     def write(self, data):
         print("Sending data from Laptop to RPi: " + str(data))
 
-        # Assume that the terminator is "\n" --> so that the Arduino / Android / RPi knows when to stop reading
-        data = data + "\n"
-        self.soc.sendall(data.encode())
-        time.sleep(self.INTER_WRITING_DELAY)
+        try:
+            # Assume that the terminator is "\n" --> so that the Arduino / Android / RPi knows when to stop reading
+            self.soc.sendall((data + "\n").encode())
+            time.sleep(self.INTER_WRITING_DELAY)
+
+        except socket.error as e:
+            print("Connection lost during writing!")
+            print(e)
+
+            print("Reconnecting to the socket...")
+            self.end()
+            self.start()
+
+            # In case there is a disconnection, the RPi will go into socket.error Exception too
+            # In that Exception handler, it should discard whatever has been read up to that point in time
+            # Laptop will resend the whole data
+            self.write(data)
 
     def read(self):
         data = ""
@@ -46,8 +59,21 @@ class WifiComm:
         while c != '\n':
             # This is a blocking READ operation
             # USE BLOCKING SINCE WE NEED TO READ THE WHOLE SENSOR READING BEFORE PROCEEDING WITH THE ALGORITHM EXECUTION
-            c = self.soc.recv(1).decode()
-            data += c
+            try:
+                c = self.soc.recv(1).decode()
+                data += c
+
+            except socket.error as e:
+                print("Connection lost during reading!")
+                print(e)
+
+                print("Reconnecting to the socket...")
+                self.end()
+                self.start()
+
+                # In case there is a disconnection, the RPi will go into socket.error Exception too
+                # In that Exception handler, it should resend the data again
+                data = c = ""
 
         # Remove any trailing newline character
         data = data.strip()
