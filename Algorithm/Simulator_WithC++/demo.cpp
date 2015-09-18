@@ -279,7 +279,7 @@ struct Robot {
 		}
 	}
 	
-	shared_ptr<Robot> do_action(const Action &action) {
+	shared_ptr<Robot> do_action(const Action &action, const bool &avoid_unexplored = false) {
 		shared_ptr<Robot> copy(new Robot(*this));
 		Position front;
 		switch(action) {
@@ -288,13 +288,13 @@ struct Robot {
 					case 0: case 2:
 						front = pos.get(dir, dir == 0 ? bot_length : 1);
 						for(int i = 0; i < bot_length; ++i)
-							if(mem.maze[front.y + i][front.x] == '#')
+							if(mem.maze[front.y + i][front.x] == '#' || avoid_unexplored && mem.maze[front.y + i][front.x] == '?')
 								return nullptr;
 						break;
 					case 1: case 3:
 						front = pos.get(dir, dir == 1 ? bot_length : 1);
 						for(int i = 0; i < bot_length; ++i)
-							if(mem.maze[front.y][front.x + i] == '#')
+							if(mem.maze[front.y][front.x + i] == '#' || avoid_unexplored && mem.maze[front.y][front.x + i] == '?')
 								return nullptr;
 						break;
 				}
@@ -320,12 +320,12 @@ struct State {
 	bool operator == (const State &other) const { return *bot == *other.bot; }
 	bool operator != (const State &other) const { return *bot != *other.bot; }
 	
-	shared_ptr<list<tuple<Action, shared_ptr<State> > > > get_children() {
+	shared_ptr<list<tuple<Action, shared_ptr<State> > > > get_children(const bool &avoid_unexplored = false) {
 		shared_ptr<list<tuple<Action, shared_ptr<State> > > > ptr_res(new list<tuple<Action, shared_ptr<State> > >());
 		for(int i = FORWARD; i <= TURN_RIGHT; ++i) {
 			Action action = static_cast<Action>(i);
 			
-			shared_ptr<Robot> temp(bot -> do_action(action));
+			shared_ptr<Robot> temp(bot -> do_action(action, avoid_unexplored));
 			if(temp != nullptr) {
 				temp -> weak_update();
 				
@@ -399,7 +399,6 @@ int west_east(const State &state) {
 	for(int r = 1; r <= N_rows; ++r)
 		for(int c = 1; c <= N_cols; ++c)
 			if(temp -> maze[r][c] == '?')
-//				value += -288 + 16 * c;
 				value += -(1 << (21 - c));
 	
 	return value;
@@ -471,7 +470,7 @@ shared_ptr<list<Action>> dijkstra(const State &state, const int &goal_x, const i
 			break;
 		}
 		
-		shared_ptr<list<tuple<Action, shared_ptr<State> > > > children = current_state -> get_children();
+		shared_ptr<list<tuple<Action, shared_ptr<State> > > > children = current_state -> get_children(true);
 		for(tuple<Action, shared_ptr<State>> el: *children) {
 			Action action = get<0>(el);
 			shared_ptr<State> next_state = get<1>(el);
