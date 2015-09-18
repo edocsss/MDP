@@ -279,7 +279,7 @@ struct Robot {
 		}
 	}
 	
-	shared_ptr<Robot> do_action(const Action &action, const bool &avoid_unexplored = false) {
+	shared_ptr<Robot> do_action(const Action &action, bool avoid_unexplored = false) {
 		shared_ptr<Robot> copy(new Robot(*this));
 		Position front;
 		switch(action) {
@@ -288,13 +288,13 @@ struct Robot {
 					case 0: case 2:
 						front = pos.get(dir, dir == 0 ? bot_length : 1);
 						for(int i = 0; i < bot_length; ++i)
-							if(mem.maze[front.y + i][front.x] == '#' || avoid_unexplored && mem.maze[front.y + i][front.x] == '?')
+							if(mem.maze[front.y + i][front.x] == '#' || avoid_unexplored && (mem.maze[front.y + i][front.x] == '?' || mem.maze[front.y + i][front.x] == 'o'))
 								return nullptr;
 						break;
 					case 1: case 3:
 						front = pos.get(dir, dir == 1 ? bot_length : 1);
 						for(int i = 0; i < bot_length; ++i)
-							if(mem.maze[front.y][front.x + i] == '#' || avoid_unexplored && mem.maze[front.y][front.x + i] == '?')
+							if(mem.maze[front.y][front.x + i] == '#' || avoid_unexplored && (mem.maze[front.y][front.x + i] == '?' || mem.maze[front.y][front.x + i] == 'o'))
 								return nullptr;
 						break;
 				}
@@ -320,7 +320,7 @@ struct State {
 	bool operator == (const State &other) const { return *bot == *other.bot; }
 	bool operator != (const State &other) const { return *bot != *other.bot; }
 	
-	shared_ptr<list<tuple<Action, shared_ptr<State> > > > get_children(const bool &avoid_unexplored = false) {
+	shared_ptr<list<tuple<Action, shared_ptr<State> > > > get_children(bool avoid_unexplored = false) {
 		shared_ptr<list<tuple<Action, shared_ptr<State> > > > ptr_res(new list<tuple<Action, shared_ptr<State> > >());
 		for(int i = FORWARD; i <= TURN_RIGHT; ++i) {
 			Action action = static_cast<Action>(i);
@@ -392,32 +392,32 @@ void print(const State &state) {
 	gotoxy(0, N_rows + 2);
 }
 
-int west_east(const State &state) {
+long long west_east(const State &state) {
 	const Knowledge * temp = &state.bot -> mem; // temporary knowledge
 	
-	int value = 0;
+	long long value = 0;
 	for(int r = 1; r <= N_rows; ++r)
 		for(int c = 1; c <= N_cols; ++c)
 			if(temp -> maze[r][c] == '?')
-				value += -(1 << (21 - c));
+				value += -(8LL << (N_cols - c + 1));
 	
 	return value;
 }
 
 shared_ptr<list<Action>> A_star(const State &current) {
-	priority_queue<pair<int, shared_ptr<State>>> pq; // max heap
-	map<State, tuple<int, shared_ptr<State>, Action>> visited;
+	priority_queue<pair<long long, shared_ptr<State>>> pq; // max heap
+	map<State, tuple<long long, shared_ptr<State>, Action>> visited;
 	
 	shared_ptr<State> start(new State(current)), goal = nullptr;
-	pq.push(make_pair(0, shared_ptr<State>(start) ));
-	visited[*start] = make_tuple(0, nullptr, FORWARD);
+	pq.push(make_pair(0LL, shared_ptr<State>(start) ));
+	visited[*start] = make_tuple(0LL, nullptr, FORWARD);
 	
 	while(!pq.empty()) {
-		pair<int, shared_ptr<State>> _ = pq.top();
+		pair<long long, shared_ptr<State>> _ = pq.top();
 		pq.pop();
 		
 		shared_ptr<State> curr = _.second;
-		int cost = get<0>(visited[*curr]);
+		long long cost = get<0>(visited[*curr]);
 		
 		if(curr -> is_terminal()) {
 			goal = curr;
@@ -439,7 +439,7 @@ shared_ptr<list<Action>> A_star(const State &current) {
 	shared_ptr<list<Action>> backtrack(new list<Action>());
 	shared_ptr<State> v = goal;
 	while(*v != *start) {
-		tuple<int, shared_ptr<State>, Action> _ = visited[*v];
+		tuple<long long, shared_ptr<State>, Action> _ = visited[*v];
 		shared_ptr<State> prev = get<1>(_);
 		Action action = get<2>(_);
 		backtrack -> push_front(action);
