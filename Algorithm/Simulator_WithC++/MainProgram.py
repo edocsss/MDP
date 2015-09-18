@@ -10,7 +10,7 @@ __author__ = 'ECAND_000'
 
 # Wi-Fi HOST & PORT
 host = "192.168.7.7"
-port = 7777
+port = 5005
 
 # Status variable
 startExplore = False

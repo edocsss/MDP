@@ -18,6 +18,10 @@ class RobotController:
 
     def explore(self):
         start = time.time()
+        stop = False
+
+        # Connect to WiFi
+        # self.wifiComm.start()
 
         # Probably before going into the loop, tell the robot to do self adjustment
         while True:
@@ -25,6 +29,8 @@ class RobotController:
             actions = subprocess.Popen(["demo", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translate()], stdout=subprocess.PIPE).communicate()[0].decode().strip()
             if len(actions) == 0:
                 break
+
+            # actions = self.wifiComm.read()
             for action in actions:
                 # Read sensors reading from Arduino
                 # sensorReading = self.wifiComm.read()
@@ -44,6 +50,7 @@ class RobotController:
                 # This checking must be done here because if not, there will be one extra ROBOT drawing (including one moveForward())
                 # If the checking is done in ui.drawRobot(), the moveForward() cannot be prevented although the robot should have stopped already before moving forward
                 if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
+                    stop = True
                     break
 
                 r = self.robot.do(action)
@@ -54,6 +61,9 @@ class RobotController:
                 # Basically each action is tested using the simulator's robot first and the actual robot sensor readings
                 # self.wifiComm.write(r)
                 self.ui.drawRobot()
+
+            if stop == True:
+                break
 
         # Last sensor reading & update
         # Only update the UPDATED GRIDS, based on the sensor reading
@@ -78,6 +88,9 @@ class RobotController:
         time.sleep(0.1)
         print("Going back to start zone...")
         self.fastestPathRun(1, 1)
+
+        # START FASTEST PATH RUN
+        self.fastestPathRun(ArenaMap.MAP_WIDTH - 2, ArenaMap.MAP_HEIGHT - 2)
 
         # PROBABLY USE A BLOCKING WI-FI READING SINCE THERE IS NO POINT IN CONTINUING THE WHILE LOOP IF THERE IS NO INCOMING DATA!!
         #

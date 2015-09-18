@@ -22,7 +22,7 @@ class WifiComm:
 
         except Exception as e:
             print("Laptop socket error!")
-            print("Error: " + e)
+            print(e)
 
     def end(self):
         print("Closing socket...")
@@ -62,6 +62,7 @@ class WifiComm:
             try:
                 c = self.soc.recv(1).decode()
                 data += c
+                print(data)
 
             except socket.error as e:
                 print("Connection lost during reading!")

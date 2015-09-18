@@ -22,7 +22,7 @@ class Robot:
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (0, 1)),
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1)),
             Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1), -1),
-            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (0, 1), -1),
+            # Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (0, 1), -1),
             Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1), -1)
         ]
 

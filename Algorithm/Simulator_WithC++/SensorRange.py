@@ -4,7 +4,7 @@ __author__ = "Edwin Candinegara"
 
 class SensorRange(Enum):
     # Range is in CENTIMETER!!
-    SHORT_SENSOR = 30
+    SHORT_SENSOR = 20
     LONG_SENSOR = 50
 
     def getValue(self):
