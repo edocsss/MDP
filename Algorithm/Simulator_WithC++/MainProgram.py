@@ -32,8 +32,16 @@ while ui.isStartExplore() == False:
     # Do nothing
     time.sleep(0.2)
 
-# When the EXPLORE button has been pressed, start exploration by initiating RobotController
-robotController.explore()   
+# Start explore
+robotController.explore()
 
 # Once done, generate the Map Descriptor file based on the last Robot's Explored Map knowledge
 mapDescriptor.writeMapDescription(robot.getMapKnowledge())
+
+# START FASTEST PATH RUN
+# while wifiComm.read() != "P":
+#     print("WRONG FASTEST PATH RUN CODE!")
+#     time.sleep(0.01)
+
+# LAST RUN!! Wait for Android
+robotController.fastestPathRun(ArenaMap.ArenaMap.MAP_WIDTH - 2, ArenaMap.ArenaMap.MAP_HEIGHT - 2)

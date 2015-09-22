@@ -21,9 +21,9 @@ class Robot:
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1)),
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (0, 1)),
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1)),
-            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1), -1),
+            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1)),
             # Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (0, 1), -1),
-            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1), -1)
+            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1))
         ]
 
         self.mapKnowledge = initialMap
@@ -128,10 +128,9 @@ class Robot:
 
         for sensor in self.sensors:
             sensorPosition = sensor.getPosition()
-            sensorRange = int(sensor.getRange().getValue() / 10) + 1
+            sensorRange = int(sensor.getRange().value / 10) + 1
 
             # Need to consider all 16 possibilities
-            # May not need the BACK_SENSOR though --> TODO LIST
             if sensor.getOrientation() == SensorPosition.FRONT_SENSOR:
                 if self.orientation == RobotOrientation.FRONT:
                     for i in range (1, sensorRange):
@@ -300,7 +299,6 @@ class Robot:
                             self.mapKnowledge.getGridMap()[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
                             break
 
-            # THIS PART IS NOT THE LATEST UPDATE SINCE WE ARE NOT USING RIGHT SENSORS
             elif sensor.getOrientation() == SensorPosition.RIGHT_SENSOR:
                 if self.orientation == RobotOrientation.FRONT:
                     for i in range (1, sensorRange):
@@ -308,7 +306,12 @@ class Robot:
                             break
 
                         if gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE:
+                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE\
+                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE_EXPLORED:
+
+                            if gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].setGridState(GridState.END_ZONE_EXPLORED)
+
                             break
 
                         self.mapKnowledge.getGridMap()[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].setGridState(GridState.EXPLORED_NO_OBSTACLE)
@@ -323,7 +326,12 @@ class Robot:
                             break
 
                         if gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE:
+                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE\
+                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE_EXPLORED:
+
+                            if gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].setGridState(GridState.END_ZONE_EXPLORED)
+
                             break
 
                         self.mapKnowledge.getGridMap()[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].setGridState(GridState.EXPLORED_NO_OBSTACLE)
@@ -338,11 +346,22 @@ class Robot:
                             break
 
                         if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE:
+                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE\
+                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE_EXPLORED:
+
+                            # For the sake of counting COMPLETION PERCENTAGE (easier than changing the whole map system)
+                            if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].setGridState(GridState.END_ZONE_EXPLORED)
+
                             break
 
+                        # Assume that those grids are empty at first
                         self.mapKnowledge.getGridMap()[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].setGridState(GridState.EXPLORED_NO_OBSTACLE)
+
+                        # Indicate which grids need to be updated
                         result.append((self.x + sensorPosition[0], self.y + i + sensorPosition[1]))
+
+                        # Check whether there is an obstacle (check with the complete map)
                         if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.EXPLORED_WITH_OBSTACLE:
                             self.mapKnowledge.getGridMap()[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
                             break
@@ -353,7 +372,12 @@ class Robot:
                             break
 
                         if gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE:
+                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE\
+                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE_EXPLORED:
+
+                            if gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].setGridState(GridState.END_ZONE_EXPLORED)
+
                             break
 
                         self.mapKnowledge.getGridMap()[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].setGridState(GridState.EXPLORED_NO_OBSTACLE)
@@ -364,3 +388,101 @@ class Robot:
 
         # Return result in the form of list of (updatedGrid.x, updatedGrid.y)
         return result
+
+    def placeObstaclesFromRobotReading(self, sensorReading, dummyMap):
+        gridMap = dummyMap.getGridMap()
+        for i in range (0, len(self.sensors)):
+            reading = int(sensorReading[i].strip())
+            sensor = self.sensors[i]
+
+            # If the sensor reading from arduino is the maximum range, then assume there is no obstacle
+            if reading == SensorRange.SHORT_SENSOR.value / 10:
+                continue
+
+            sensorPosition = sensor.getPosition()
+            if sensor.getOrientation() == SensorPosition.FRONT_SENSOR:
+                if self.orientation == RobotOrientation.FRONT:
+                    posY = self.y + sensorPosition[1] + reading + 1
+                    posX = self.x + sensorPosition[0]
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
+
+                elif self.orientation == RobotOrientation.BACK:
+                    posY = self.y - sensorPosition[1] - reading - 1
+                    posX = self.x - sensorPosition[0]
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
+
+                elif self.orientation == RobotOrientation.LEFT:
+                    posY = self.y + sensorPosition[0]
+                    posX = self.x - sensorPosition[1] - reading - 1
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
+
+                elif self.orientation == RobotOrientation.RIGHT:
+                    posY = self.y - sensorPosition[0]
+                    posX = self.x + sensorPosition[1] + reading + 1
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
+
+            elif sensor.getOrientation() == SensorPosition.LEFT_SENSOR:
+                if self.orientation == RobotOrientation.FRONT:
+                    posY = self.y + sensorPosition[0]
+                    posX = self.x - sensorPosition[1] - reading - 1
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
+
+                elif self.orientation == RobotOrientation.BACK:
+                    posY = self.y - sensorPosition[0]
+                    posX = self.x + sensorPosition[1] + reading + 1
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
+
+                elif self.orientation == RobotOrientation.LEFT:
+                    posY = self.y - sensorPosition[1] - reading - 1
+                    posX = self.x - sensorPosition[0]
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
+
+                elif self.orientation == RobotOrientation.RIGHT:
+                    posY = self.y + sensorPosition[1] + reading + 1
+                    posX = self.x + sensorPosition[0]
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
+
+            elif sensor.getOrientation() == SensorPosition.RIGHT_SENSOR:
+                if self.orientation == RobotOrientation.FRONT:
+                    posY = self.y - sensorPosition[0]
+                    posX = self.x + sensorPosition[1] + reading + 1
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
+
+                elif self.orientation == RobotOrientation.BACK:
+                    posY = self.y + sensorPosition[0]
+                    posX = self.x - sensorPosition[1] - reading - 1
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
+
+                elif self.orientation == RobotOrientation.LEFT:
+                    posY = self.y + sensorPosition[1] + reading + 1
+                    posX = self.x + sensorPosition[0]
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
+
+                elif self.orientation == RobotOrientation.RIGHT:
+                    posY = self.y - sensorPosition[1] - reading - 1
+                    posX = self.x - sensorPosition[0]
+
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)

@@ -32,7 +32,7 @@ class MainUI(threading.Thread):
         self.arenaMap = arenaMap
         self.obstacleMap = obstacleMap
         self.robot = robot
-        self.robotSpeed = 0.05
+        self.robotSpeed = 0.1
         self.maxPercentage = 100.00
         self.maxTime = 1000.00 # In seconds
         self.startTime = time.time() # Any initial time --> does not really matter since the starting time will be overwritten in self.startExplore()
@@ -51,6 +51,7 @@ class MainUI(threading.Thread):
 
     def startExplorationWindow(self):
         self.canvas.delete("all")
+        self.realRunButton.destroy()
         self.saveButton.destroy()
         self.loadMapButton.destroy()
         self.openExplorationWindow()
@@ -76,6 +77,9 @@ class MainUI(threading.Thread):
         self.root.mainloop()
 
     def buildWall(self):
+        self.realRunButton = tkinter.Button(self.root, text="Real Run!", command=self.startExplorationWindow)
+        self.realRunButton.pack(side=tkinter.LEFT, ipadx=10, ipady=10, padx=10, pady=20)
+
         self.saveButton = tkinter.Button(self.root, text="Save Obstacles!", command=self.startExplorationWindow)
         self.saveButton.pack(side=tkinter.LEFT, ipadx=10, ipady=10, padx=10, pady=20)
 

@@ -62,7 +62,6 @@ class WifiComm:
             try:
                 c = self.soc.recv(1).decode()
                 data += c
-                print(data)
 
             except socket.error as e:
                 print("Connection lost during reading!")
@@ -79,6 +78,7 @@ class WifiComm:
         # Remove any trailing newline character
         data = data.strip()
 
+        print("Received data: " + data)
         if len(data) > 0:
             return data
         else:

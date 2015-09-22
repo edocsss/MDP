@@ -1,3 +1,4 @@
+import Util
 from Grid import *
 from GridState import *
 
@@ -80,7 +81,7 @@ class ArenaMap:
     def getPercentageExploredGrids(self):
         return 100 * self.countExploredGrids() / (self.MAP_HEIGHT * self.MAP_WIDTH)
 
-    def translate(self):
+    def translateAlgorithm(self):
         r = ""
 
         # Format
@@ -100,3 +101,27 @@ class ArenaMap:
                     r += "#"
 
         return r
+
+    def translateAndroid(self):
+        r = ""
+
+        # Format
+        # 0 = NO OBSTACLE (REGARDLESS WHETHER IT IS EXPLORED OR NOT)
+        # 1 = OBSTACLE
+        for m in range (0, self.MAP_HEIGHT):
+            for n in range (0, self.MAP_WIDTH):
+                if self.gridMap[m][n].state == GridState.UNEXPLORED \
+                    or self.gridMap[m][n].state == GridState.EXPLORED_NO_OBSTACLE \
+                    or self.gridMap[m][n].state == GridState.START_ZONE \
+                    or self.gridMap[m][n].state == GridState.END_ZONE \
+                    or self.gridMap[m][n].state == GridState.END_ZONE_EXPLORED:
+                    r += "0"
+                elif self.gridMap[m][n].state == GridState.EXPLORED_WITH_OBSTACLE:
+                    r += "1"
+
+        result = ""
+        for i in range (0, len(r), 4):
+            b = Util.binaryToHex(r[i : i + 4])
+            result += b
+
+        return result
