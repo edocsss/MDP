@@ -17,6 +17,7 @@ class RobotController:
         self.algorithm = algorithm
         self.wifiComm = wifiComm
         self.ui = ui
+        self.goalReached = False
 
     def explore(self):
         # Start WiFi
@@ -66,6 +67,10 @@ class RobotController:
 
                 # Redraw robot
                 self.ui.drawRobot()
+
+
+                # Check whether the robot has ever reached goal zone
+                self.checkGoalReached()
 
 
                 # Send action to Arduino
@@ -126,15 +131,17 @@ class RobotController:
 
 
         # RUN FASTEST PATH ALGORITHM HERE TO END ZONE (ArenaMap.MAP_WIDTH - 1, ArenaMap.MAP_HEIGHT - 1)
-        print("Going to end zone...")
-        self.fastestPathRun(ArenaMap.MAP_WIDTH - 2, ArenaMap.MAP_HEIGHT - 2)
+        if self.goalReached == False:
+            print("Going back to start zone only because we have not reached the goal zone...")
+            self.fastestPathRun(1, 1)
+        else:
+            print("Going to end zone if not reached yet...")
+            self.fastestPathRun(ArenaMap.MAP_WIDTH - 2, ArenaMap.MAP_HEIGHT - 2)
 
-
-        # RUN FASTEST PATH ALGORITHM HERE TO GO BACK TO (1,1) --> ROBOT'S CENTRAL POSITION
-        time.sleep(0.1)
-        print("Going back to start zone...")
-        self.fastestPathRun(1, 1)
-
+            # RUN FASTEST PATH ALGORITHM HERE TO GO BACK TO (1,1) --> ROBOT'S CENTRAL POSITION
+            time.sleep(0.1)
+            print("Going back to start zone...")
+            self.fastestPathRun(1, 1)
 
 
     def fastestPathRun(self, targetX, targetY):
@@ -153,3 +160,8 @@ class RobotController:
         # The algorithm runs once and only once
         # The algorithm must return a bunch of actions from the Start zone to the End Zone all at once
         return
+
+
+    def checkGoalReached(self):
+        if self.goalReached == False and self.robot.x == ArenaMap.MAP_WIDTH - 2 and self.robot.y == ArenaMap.MAP_HEIGHT - 2:
+            self.goalReached = True

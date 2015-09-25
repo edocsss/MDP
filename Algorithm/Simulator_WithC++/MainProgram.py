@@ -44,4 +44,7 @@ mapDescriptor.writeMapDescription(robot.getMapKnowledge())
 #     time.sleep(0.01)
 
 # LAST RUN!! Wait for Android
-robotController.fastestPathRun(ArenaMap.ArenaMap.MAP_WIDTH - 2, ArenaMap.ArenaMap.MAP_HEIGHT - 2)
+if robotController.goalReached == True:
+    robotController.fastestPathRun(ArenaMap.ArenaMap.MAP_WIDTH - 2, ArenaMap.ArenaMap.MAP_HEIGHT - 2)
+else:
+    print("Impossible to do fastest path run since we have not reached the goal zone yet!")
