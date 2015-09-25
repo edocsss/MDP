@@ -48,7 +48,7 @@ class RobotController:
         # Probably before going into the loop, tell the robot to do self adjustment
         while True:
             # Data sent --> (x, y, orientation, mapKnowledge)
-            actions = subprocess.Popen(["demo", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm()], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+            actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm()], stdout=subprocess.PIPE).communicate()[0].decode().strip()
             if len(actions) == 0:
                 break
 
@@ -147,7 +147,7 @@ class RobotController:
     def fastestPathRun(self, targetX, targetY):
         print("Running fastest path algorithm...")
 
-        actions = subprocess.Popen(["demo", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), str(targetX), str(targetY)], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+        actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), str(targetX), str(targetY)], stdout=subprocess.PIPE).communicate()[0].decode().strip()
         for action in actions:
             self.robot.do(action)
 
