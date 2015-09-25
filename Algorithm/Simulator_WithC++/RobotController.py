@@ -21,13 +21,13 @@ class RobotController:
 
     def explore(self):
         # Start WiFi
-        # self.wifiComm.start()
+        self.wifiComm.start()
 
 
         # Wait for Android initialization
-        # while self.wifiComm.read() != 'S':
-        #     print("WRONG EXPLORATION START CODE!")
-        #     time.sleep(0.01)
+        #while self.wifiComm.read() != 'S':
+        #    print("WRONG EXPLORATION START CODE!")
+        #    time.sleep(0.01)
 
 
         stop = False
@@ -36,19 +36,22 @@ class RobotController:
 ######################################################################################################################
 
         # Initial sensor read
-        # sensorReading = self.wifiComm.read()
-        # self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
-        updatedGrids = self.robot.readSensors(self.completeMap)
-        for n in updatedGrids:
-            x, y = n[0], n[1]
-            self.ui.drawGrid(x, y)
+        #sensorReading = self.wifiComm.read()
+        #self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
+        #updatedGrids = self.robot.readSensors(self.completeMap)
+        #for n in updatedGrids:
+            #x, y = n[0], n[1]
+            #self.ui.drawGrid(x, y)
 
 ######################################################################################################################
 
         # Probably before going into the loop, tell the robot to do self adjustment
         while True:
             # Data sent --> (x, y, orientation, mapKnowledge)
-            actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm()], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+            #actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm()], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+            # actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), "--ganteng"], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+
+            actions = self.wifiComm.read()
             if len(actions) == 0:
                 break
 
@@ -74,7 +77,7 @@ class RobotController:
 
 
                 # Send action to Arduino
-                # self.wifiComm.write("1" + action)
+                #self.wifiComm.write("1" + action)
 
 
                 # Update map counter
@@ -82,16 +85,16 @@ class RobotController:
 
 
                 # Send the map to Android after UPDATE_MAP actions
-                if updateMapCounter >= self.UPDATE_MAP:
+                # if updateMapCounter >= self.UPDATE_MAP:
                     # print("Sending Robot's map knowledge to Android...")
-                    updateMapCounter = 0
+                    # updateMapCounter = 0
                     # self.wifiComm.write("2" + self.robot.mapKnowledge.translateAndroid())
 
 
                 # Read sensors reading from Arduino
                 # Read after the map update because the Arduino needs some time to execute the action. Meanwhile, the simulator can send the whole 75 hex to Android --> don't waste time
-                # sensorReading = self.wifiComm.read()
-                # self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
+                sensorReading = self.wifiComm.read()
+                self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
 
                 # Only update the UPDATED GRIDS, based on the sensor reading
                 updatedGrids = self.robot.readSensors(self.completeMap)
@@ -114,8 +117,8 @@ class RobotController:
 
         # Last sensor reading & update
         # Read sensors reading from Arduino
-        # sensorReading = self.wifiComm.read()
-        # self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
+        sensorReading = self.wifiComm.read()
+        self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
         updatedGrids = self.robot.readSensors(self.completeMap)
         for n in updatedGrids:
             x, y = n[0], n[1]
@@ -131,7 +134,7 @@ class RobotController:
 
 
         # RUN FASTEST PATH ALGORITHM HERE TO END ZONE (ArenaMap.MAP_WIDTH - 1, ArenaMap.MAP_HEIGHT - 1)
-        if self.goalReached == False:
+        if self.goalReached == True:
             print("Going back to start zone only because we have not reached the goal zone...")
             self.fastestPathRun(1, 1)
         else:
@@ -152,7 +155,7 @@ class RobotController:
             self.robot.do(action)
 
             # Send action to Arduino
-            # self.wifiComm.write("1" + action)
+            self.wifiComm.write("1" + action)
 
             self.ui.drawRobot()
 

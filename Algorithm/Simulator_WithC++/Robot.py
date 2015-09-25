@@ -21,8 +21,8 @@ class Robot:
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1)),
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (0, 1)),
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1)),
-            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1)),
-            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1)),
+            #Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1)),
+            #Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1)),
             Sensor.Sensor(SensorPosition.RIGHT_SENSOR, SensorRange.LONG_SENSOR, (-1, 1))
         ]
 
@@ -396,7 +396,7 @@ class Robot:
             sensor = self.sensors[i]
 
             # If the sensor reading from arduino is the maximum range, then assume there is no obstacle
-            if reading == SensorRange.SHORT_SENSOR.value / 10:
+            if reading == sensor.range.value / 10:
                 continue
 
             sensorPosition = sensor.getPosition()

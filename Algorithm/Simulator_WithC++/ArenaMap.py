@@ -125,3 +125,11 @@ class ArenaMap:
             result += b
 
         return result
+
+    def printMap(self):
+        for m in range (0, self.MAP_HEIGHT):
+            for n in range (0, self.MAP_WIDTH):
+                g = self.gridMap[m][n].state
+                print(g.value, end="")
+
+        print()
