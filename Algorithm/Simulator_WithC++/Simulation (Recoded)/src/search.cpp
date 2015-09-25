@@ -111,7 +111,7 @@ void simulate(int pos_x, int pos_y, int dir, shared_ptr<list<Action>> actions) {
 			puts("");
 		}
 
-		this_thread::sleep_for(chrono::milliseconds(50));
+		this_thread::sleep_for(chrono::milliseconds(100));
 	}
 }
 
@@ -189,8 +189,8 @@ int main(int argc, char ** argv) {
 		}
 		puts("");
 
-		getchar();
-		simulate(2, 2, 0, actions);
+		//getchar();
+		//simulate(2, 2, 0, actions);
 	}
 	else if (argc == 7) {
 		int s_x = atol(argv[1]),
@@ -220,8 +220,8 @@ int main(int argc, char ** argv) {
 		}
 		puts("");
 
-		getchar();
-		simulate(2, 2, 0, actions);
+		//getchar();
+		//simulate(2, 2, 0, actions);
 	}
 
 	return 0;

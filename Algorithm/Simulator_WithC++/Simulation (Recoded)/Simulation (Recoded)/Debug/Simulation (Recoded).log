@@ -1,4 +1,4 @@
-﻿Build started 24/9/2015 9:24:29 PM.
+﻿Build started 25/9/2015 8:56:57 AM.
      1>Project "C:\Users\Peter\Documents\NTU\Course\CZ3004-MULTIDISCIPLINARY DESIGN PROJECT\Simulation (Recoded)\Simulation (Recoded)\Simulation (Recoded).vcxproj" on node 2 (Build target(s)).
      1>ClCompile:
          C:\Program Files (x86)\Microsoft Visual Studio 14.0\VC\bin\CL.exe /c /ZI /nologo /W3 /WX- /Od /Oy- /D WIN32 /D _DEBUG /D _CONSOLE /D _UNICODE /D UNICODE /Gm /EHsc /RTC1 /MDd /GS /fp:precise /Zc:wchar_t /Zc:forScope /Zc:inline /Fo"Debug\\" /Fd"Debug\vc140.pdb" /Gd /TP /analyze- /errorReport:prompt ..\src\search.cpp
@@ -10,4 +10,4 @@
 
 Build succeeded.
 
-Time Elapsed 00:00:01.10
+Time Elapsed 00:00:02.20
