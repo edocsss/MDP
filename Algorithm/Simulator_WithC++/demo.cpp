@@ -399,7 +399,8 @@ long long west_east(const State &state) {
 	for(int r = 1; r <= N_rows; ++r)
 		for(int c = 1; c <= N_cols; ++c)
 			if(temp -> maze[r][c] == '?')
-				value += -(8LL << (N_cols - c + 1));
+//				value += -(8LL << (N_cols - c + 1));
+				value += -288 + 16 * c;
 	
 	return value;
 }
@@ -429,8 +430,9 @@ shared_ptr<list<Action>> A_star(const State &current) {
 			Action action = get<0>(el);
 			shared_ptr<State> next = get<1>(el);
 			
+			int transition_cost = action == FORWARD ? -1 : -3;
 			if(visited.find(*next) == visited.end()) {
-				visited[*next] = make_tuple(cost + transition, curr, action);
+				visited[*next] = make_tuple(cost + transition_cost, curr, action);
 				pq.push(make_pair(cost + transition + west_east(*next), next ));
 			}
 		}
