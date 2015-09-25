@@ -84,7 +84,7 @@ struct Sensor {
 };
 
 const int N_sensors = 6;
-Sensor sensors[N_sensors]{ Sensor(-1, 1, 0, 2), Sensor(0, 1, 0, 2), Sensor(1, 1, 0, 2), Sensor(-1, 1, -1, 2), Sensor(-1, 0, -1, 2) };
+Sensor sensors[N_sensors]{ Sensor(-1, 1, 0, 2), Sensor(0, 1, 0, 2), Sensor(1, 1, 0, 2), Sensor(-1, 1, -1, 2), Sensor(-1, 0, -1, 2), Sensor(1, 1, 1, 5) };
 
 struct BotState {
 	int pos_x, pos_y, dir;
