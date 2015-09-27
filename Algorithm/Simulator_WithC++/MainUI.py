@@ -204,7 +204,7 @@ class MainUI(threading.Thread):
             fillColor = "#FFFFFF"
         elif gridState == GridState.EXPLORED_WITH_OBSTACLE:
             fillColor = "#333333"
-        elif gridState == GridState.START_ZONE:
+        elif gridState == GridState.START_ZONE or gridState == GridState.START_ZONE_EXPLORED:
             fillColor = "#00FF00"
         elif gridState == GridState.END_ZONE or gridState == GridState.END_ZONE_EXPLORED:
             fillColor = "#FF0000"
@@ -228,6 +228,7 @@ class MainUI(threading.Thread):
         # timeoutStop = self.checkTimeout()
         time.sleep(self.robotSpeed)
 
+        # DRAWING HACK FOR PYTHON TKINTER CANVAS!!
         # DRAW WHITE RECTANGLES FOR THE ROBOT TRAIL --> ROBOT_CENTER.ROW - 2
         if robotOrientation == RobotOrientation.FRONT:
             positionX = self.robot.getPositionX()
@@ -246,7 +247,8 @@ class MainUI(threading.Thread):
                         fillColor = "#FFFFFF"
                     elif self.arenaMap.getGridMap()[positionY - 2][positionX + i].getGridState() == GridState.EXPLORED_WITH_OBSTACLE:
                         fillColor = "#333333"
-                    elif self.arenaMap.getGridMap()[positionY - 2][positionX + i].getGridState() == GridState.START_ZONE:
+                    elif self.arenaMap.getGridMap()[positionY - 2][positionX + i].getGridState() == GridState.START_ZONE\
+                         or self.arenaMap.getGridMap()[positionY - 2][positionX + i].getGridState() == GridState.START_ZONE_EXPLORED:
                         fillColor = "#00FF00"
                     elif self.arenaMap.getGridMap()[positionY - 2][positionX + i].getGridState() == GridState.END_ZONE\
                          or self.arenaMap.getGridMap()[positionY - 2][positionX + i].getGridState() == GridState.END_ZONE_EXPLORED:
@@ -272,7 +274,8 @@ class MainUI(threading.Thread):
                         fillColor = "#FFFFFF"
                     elif self.arenaMap.getGridMap()[positionY + 2][positionX + i].getGridState() == GridState.EXPLORED_WITH_OBSTACLE:
                         fillColor = "#333333"
-                    elif self.arenaMap.getGridMap()[positionY + 2][positionX + i].getGridState() == GridState.START_ZONE:
+                    elif self.arenaMap.getGridMap()[positionY + 2][positionX + i].getGridState() == GridState.START_ZONE \
+                         or self.arenaMap.getGridMap()[positionY + 2][positionX + i].getGridState() == GridState.START_ZONE_EXPLORED:
                         fillColor = "#00FF00"
                     elif self.arenaMap.getGridMap()[positionY + 2][positionX + i].getGridState() == GridState.END_ZONE\
                          or self.arenaMap.getGridMap()[positionY + 2][positionX + i].getGridState() == GridState.END_ZONE_EXPLORED:
@@ -298,7 +301,8 @@ class MainUI(threading.Thread):
                         fillColor = "#FFFFFF"
                     elif self.arenaMap.getGridMap()[positionY + i][positionX + 2].getGridState() == GridState.EXPLORED_WITH_OBSTACLE:
                         fillColor = "#333333"
-                    elif self.arenaMap.getGridMap()[positionY + i][positionX + 2].getGridState() == GridState.START_ZONE:
+                    elif self.arenaMap.getGridMap()[positionY + i][positionX + 2].getGridState() == GridState.START_ZONE \
+                         or self.arenaMap.getGridMap()[positionY + i][positionX + 2].getGridState() == GridState.START_ZONE_EXPLORED:
                         fillColor = "#00FF00"
                     elif self.arenaMap.getGridMap()[positionY + i][positionX + 2].getGridState() == GridState.END_ZONE \
                          or self.arenaMap.getGridMap()[positionY + i][positionX + 2].getGridState() == GridState.END_ZONE_EXPLORED:
@@ -324,7 +328,8 @@ class MainUI(threading.Thread):
                         fillColor = "#FFFFFF"
                     elif self.arenaMap.getGridMap()[positionY + i][positionX - 2].getGridState() == GridState.EXPLORED_WITH_OBSTACLE:
                         fillColor = "#333333"
-                    elif self.arenaMap.getGridMap()[positionY + i][positionX - 2].getGridState() == GridState.START_ZONE:
+                    elif self.arenaMap.getGridMap()[positionY + i][positionX - 2].getGridState() == GridState.START_ZONE\
+                         or self.arenaMap.getGridMap()[positionY + i][positionX - 2].getGridState() == GridState.START_ZONE_EXPLORED:
                         fillColor = "#00FF00"
                     elif self.arenaMap.getGridMap()[positionY + i][positionX - 2].getGridState() == GridState.END_ZONE\
                          or self.arenaMap.getGridMap()[positionY + i][positionX - 2].getGridState() == GridState.END_ZONE_EXPLORED:

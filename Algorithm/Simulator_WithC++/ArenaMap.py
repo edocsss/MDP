@@ -70,9 +70,9 @@ class ArenaMap:
         count = 0
         for m in range (0, self.MAP_HEIGHT):
             for n in range (0, self.MAP_WIDTH):
-                if self.gridMap[m][n].getGridState() == GridState.START_ZONE \
-                   or self.gridMap[m][n].getGridState() == GridState.EXPLORED_NO_OBSTACLE \
+                if self.gridMap[m][n].getGridState() == GridState.EXPLORED_NO_OBSTACLE \
                    or self.gridMap[m][n].getGridState() == GridState.EXPLORED_WITH_OBSTACLE\
+                   or self.gridMap[m][n].getGridState() == GridState.START_ZONE_EXPLORED \
                    or self.gridMap[m][n].getGridState() == GridState.END_ZONE_EXPLORED:
                     count += 1
 
@@ -91,10 +91,11 @@ class ArenaMap:
         for m in range (0, self.MAP_HEIGHT):
             for n in range (0,self.MAP_WIDTH):
                 if self.gridMap[m][n].state == GridState.UNEXPLORED \
-                        or self.gridMap[m][n].state == GridState.END_ZONE:
+                    or self.gridMap[m][n].state == GridState.START_ZONE \
+                    or self.gridMap[m][n].state == GridState.END_ZONE:
                     r += "?"
                 elif self.gridMap[m][n].state == GridState.EXPLORED_NO_OBSTACLE\
-                        or self.gridMap[m][n].state == GridState.START_ZONE\
+                        or self.gridMap[m][n].state == GridState.START_ZONE_EXPLORED\
                         or self.gridMap[m][n].state == GridState.END_ZONE_EXPLORED:
                     r += "."
                 elif self.gridMap[m][n].state == GridState.EXPLORED_WITH_OBSTACLE:
@@ -113,6 +114,7 @@ class ArenaMap:
                 if self.gridMap[m][n].state == GridState.UNEXPLORED \
                     or self.gridMap[m][n].state == GridState.EXPLORED_NO_OBSTACLE \
                     or self.gridMap[m][n].state == GridState.START_ZONE \
+                    or self.gridMap[m][n].state == GridState.START_ZONE_EXPLORED \
                     or self.gridMap[m][n].state == GridState.END_ZONE \
                     or self.gridMap[m][n].state == GridState.END_ZONE_EXPLORED:
                     r += "0"

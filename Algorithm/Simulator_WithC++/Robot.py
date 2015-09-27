@@ -9,11 +9,13 @@ from Direction import *
 __author__ = 'ECAND_000'
 
 class Robot:
+    START_ZONE_COORDINATES = [(0, 0), (0, 1), (0, 2), (1, 0), (1, 1), (1, 2), (2, 0), (2, 1), (2, 2)]
+
     def __init__(self, initialMap):
         # (x, y) = (1, 1) because we assume that the robot is 3 x 3 and it is placed right
         # in the middle of the 3 x 3 box
         self.x = 1
-        self.y = 1
+        self.y = 3
         self.orientation = RobotOrientation.FRONT
 
         # For sensor reading simplicity, the POSITION of the sensor is as if the sensor is placed in the front and then rotated
@@ -21,12 +23,20 @@ class Robot:
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1)),
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (0, 1)),
             Sensor.Sensor(SensorPosition.FRONT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1)),
-            #Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1)),
-            #Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1)),
+            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (-1, 1)),
+            Sensor.Sensor(SensorPosition.LEFT_SENSOR, SensorRange.SHORT_SENSOR, (1, 1)),
             Sensor.Sensor(SensorPosition.RIGHT_SENSOR, SensorRange.LONG_SENSOR, (-1, 1))
         ]
 
         self.mapKnowledge = initialMap
+
+        # Wherever the robot is, that 3x3 square of the robot is infered as EXPLORED_NO_OBSTACLE (EXCEPT IF THE ROBOT'S MIDDLE IS AT (1, 1))
+        for i in range (-1, 2):
+            for j in range (-1, 2):
+                if (self.x + j, self.y + i) in self.START_ZONE_COORDINATES:
+                    self.mapKnowledge.gridMap[self.y + i][self.x + j].setGridState(GridState.START_ZONE_EXPLORED)
+                else:
+                    self.mapKnowledge.gridMap[self.y + i][self.x + j].setGridState(GridState.EXPLORED_NO_OBSTACLE)
 
     def __eq__(self, other):
         return self.x == other.x and self.y == other.y and self.orientation == other.orientation and self.mapKnowledge == other.mapKnowledge
@@ -138,12 +148,14 @@ class Robot:
                             break
 
                         if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE_EXPLORED:
+                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE:
 
                             # For the sake of counting COMPLETION PERCENTAGE (easier than changing the whole map system)
                             if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE:
                                 self.mapKnowledge.getGridMap()[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].setGridState(GridState.END_ZONE_EXPLORED)
+
+                            if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.START_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].setGridState(GridState.START_ZONE_EXPLORED)
 
                             break
 
@@ -164,11 +176,13 @@ class Robot:
                             break
 
                         if gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE_EXPLORED:
+                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE:
 
                             if gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE:
                                 self.mapKnowledge.getGridMap()[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].setGridState(GridState.END_ZONE_EXPLORED)
+
+                            if gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.START_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].setGridState(GridState.START_ZONE_EXPLORED)
 
                             break
 
@@ -184,11 +198,13 @@ class Robot:
                             break
 
                         if gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE_EXPLORED:
+                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE:
 
                             if gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE:
                                 self.mapKnowledge.getGridMap()[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].setGridState(GridState.END_ZONE_EXPLORED)
+
+                            if gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.START_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].setGridState(GridState.START_ZONE_EXPLORED)
 
                             break
 
@@ -204,12 +220,14 @@ class Robot:
                             break
 
                         if gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE_EXPLORED:
+                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE:
 
                             if gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE:
                                 self.mapKnowledge.getGridMap()[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].setGridState(GridState.END_ZONE_EXPLORED)
 
+                            if gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.START_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].setGridState(GridState.START_ZONE_EXPLORED)
+                                
                             break
 
                         self.mapKnowledge.getGridMap()[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].setGridState(GridState.EXPLORED_NO_OBSTACLE)
@@ -225,11 +243,13 @@ class Robot:
                             break
 
                         if gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE_EXPLORED:
+                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE:
 
                             if gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE:
                                 gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].setGridState(GridState.END_ZONE_EXPLORED)
+
+                            if gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.START_ZONE:
+                                gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].setGridState(GridState.START_ZONE_EXPLORED)
 
                             break
 
@@ -245,11 +265,13 @@ class Robot:
                             break
 
                         if gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE_EXPLORED:
-
+                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE:
+                            
                             if gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE:
                                 self.mapKnowledge.getGridMap()[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].setGridState(GridState.END_ZONE_EXPLORED)
+
+                            if gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.START_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].setGridState(GridState.START_ZONE_EXPLORED)
 
                             break
 
@@ -265,12 +287,14 @@ class Robot:
                             break
 
                         if gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE_EXPLORED:
+                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE:
 
                             if gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE:
                                 self.mapKnowledge.getGridMap()[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].setGridState(GridState.END_ZONE_EXPLORED)
 
+                            if gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.START_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].setGridState(GridState.START_ZONE_EXPLORED)
+                                
                             break
 
                         self.mapKnowledge.getGridMap()[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].setGridState(GridState.EXPLORED_NO_OBSTACLE)
@@ -285,11 +309,13 @@ class Robot:
                             break
 
                         if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE_EXPLORED:
+                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE:
 
                             if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE:
                                 self.mapKnowledge.getGridMap()[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].setGridState(GridState.END_ZONE_EXPLORED)
+
+                            if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.START_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].setGridState(GridState.START_ZONE_EXPLORED)
 
                             break
 
@@ -306,11 +332,13 @@ class Robot:
                             break
 
                         if gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE_EXPLORED:
+                            or gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE:                            
 
                             if gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.END_ZONE:
                                 self.mapKnowledge.getGridMap()[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].setGridState(GridState.END_ZONE_EXPLORED)
+
+                            if gridMap[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].getGridState() == GridState.START_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y - sensorPosition[0]][self.x + sensorPosition[1] + i].setGridState(GridState.START_ZONE_EXPLORED)
 
                             break
 
@@ -326,11 +354,13 @@ class Robot:
                             break
 
                         if gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE_EXPLORED:
+                            or gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE:
 
                             if gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.END_ZONE:
                                 self.mapKnowledge.getGridMap()[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].setGridState(GridState.END_ZONE_EXPLORED)
+
+                            if gridMap[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].getGridState() == GridState.START_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y + sensorPosition[0]][self.x - i - sensorPosition[1]].setGridState(GridState.START_ZONE_EXPLORED)
 
                             break
 
@@ -346,12 +376,14 @@ class Robot:
                             break
 
                         if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE_EXPLORED:
+                            or gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE:
 
                             # For the sake of counting COMPLETION PERCENTAGE (easier than changing the whole map system)
                             if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.END_ZONE:
                                 self.mapKnowledge.getGridMap()[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].setGridState(GridState.END_ZONE_EXPLORED)
+
+                            if gridMap[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].getGridState() == GridState.START_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y + i + sensorPosition[1]][self.x + sensorPosition[0]].setGridState(GridState.START_ZONE_EXPLORED)
 
                             break
 
@@ -372,11 +404,13 @@ class Robot:
                             break
 
                         if gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.START_ZONE\
-                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE\
-                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE_EXPLORED:
+                            or gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE:
 
                             if gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.END_ZONE:
                                 self.mapKnowledge.getGridMap()[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].setGridState(GridState.END_ZONE_EXPLORED)
+
+                            if gridMap[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].getGridState() == GridState.START_ZONE:
+                                self.mapKnowledge.getGridMap()[self.y - i - sensorPosition[1]][self.x - sensorPosition[0]].setGridState(GridState.START_ZONE_EXPLORED)
 
                             break
 

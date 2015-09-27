@@ -19,9 +19,18 @@ class RobotController:
         self.ui = ui
         self.goalReached = False
 
+    def robotReadSensor(self):
+        #sensorReading = self.wifiComm.read()
+        #self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
+        updatedGrids = self.robot.readSensors(self.completeMap)
+        for n in updatedGrids:
+            x, y = n[0], n[1]
+            self.ui.drawGrid(x, y)
+        
+
     def explore(self):
         # Start WiFi
-        self.wifiComm.start()
+        # self.wifiComm.start()
 
 
         # Wait for Android initialization
@@ -36,12 +45,7 @@ class RobotController:
 ######################################################################################################################
 
         # Initial sensor read
-        #sensorReading = self.wifiComm.read()
-        #self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
-        #updatedGrids = self.robot.readSensors(self.completeMap)
-        #for n in updatedGrids:
-            #x, y = n[0], n[1]
-            #self.ui.drawGrid(x, y)
+        self.robotReadSensor()
 
 ######################################################################################################################
 
@@ -49,9 +53,9 @@ class RobotController:
         while True:
             # Data sent --> (x, y, orientation, mapKnowledge)
             #actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm()], stdout=subprocess.PIPE).communicate()[0].decode().strip()
-            # actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), "--ganteng"], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+            actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), "--ganteng"], stdout=subprocess.PIPE).communicate()[0].decode().strip()
 
-            actions = self.wifiComm.read()
+            # actions = self.wifiComm.read()
             if len(actions) == 0:
                 break
 
@@ -64,10 +68,7 @@ class RobotController:
                 # The robot simulator does the action
                 r = self.robot.do(action)
                 if r == False:
-                    updatedGrids = self.robot.readSensors(self.completeMap)
-                    for n in updatedGrids:
-                        x, y = n[0], n[1]
-                        self.ui.drawGrid(x, y)
+                    self.robotReadSensor()
                     print("FALSE!!")
                     break
 
@@ -90,16 +91,7 @@ class RobotController:
                     # self.wifiComm.write("2" + self.robot.mapKnowledge.translateAndroid())
 
 
-                # Read sensors reading from Arduino
-                # Read after the map update because the Arduino needs some time to execute the action. Meanwhile, the simulator can send the whole 75 hex to Android --> don't waste time
-                sensorReading = self.wifiComm.read()
-                self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
-
-                # Only update the UPDATED GRIDS, based on the sensor reading
-                updatedGrids = self.robot.readSensors(self.completeMap)
-                for n in updatedGrids:
-                    x, y = n[0], n[1]
-                    self.ui.drawGrid(x, y)
+                self.robotReadSensor()
 
 
                 # This checking must be done here because if not, there will be one extra ROBOT drawing (including one moveForward())
@@ -116,12 +108,7 @@ class RobotController:
 
         # Last sensor reading & update
         # Read sensors reading from Arduino
-        sensorReading = self.wifiComm.read()
-        self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
-        updatedGrids = self.robot.readSensors(self.completeMap)
-        for n in updatedGrids:
-            x, y = n[0], n[1]
-            self.ui.drawGrid(x, y)
+        self.robotReadSensor()
 
 
         # Last percentage update
@@ -154,7 +141,7 @@ class RobotController:
             self.robot.do(action)
 
             # Send action to Arduino
-            self.wifiComm.write("1" + action)
+            # self.wifiComm.write("1" + action)
 
             self.ui.drawRobot()
 
