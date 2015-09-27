@@ -55,6 +55,9 @@ class RobotController:
 
             # Iterating the action list
             for action in actions:
+                # Check whether the robot has ever reached goal zone
+                self.checkGoalReached()
+                
                 # The robot simulator does the action
                 r = self.robot.do(action)
                 if r == False:
@@ -67,10 +70,6 @@ class RobotController:
 
                 # Redraw robot
                 self.ui.drawRobot()
-
-
-                # Check whether the robot has ever reached goal zone
-                self.checkGoalReached()
 
 
                 # Send action to Arduino
