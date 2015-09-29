@@ -18,6 +18,9 @@ class RobotController:
         self.wifiComm = wifiComm
         self.ui = ui
         self.goalReached = False
+        self.trackPosition = [[False for i in range (0, ArenaMap.MAP_WIDTH)] for j in range (0, ArenaMap.MAP_HEIGHT)]
+        self.trackOrientation = [[[False, False, False, False] for i in range (0, ArenaMap.MAP_WIDTH)] for j in range (0, ArenaMap.MAP_HEIGHT)]
+        self.checkTracking = True
 
     def robotReadSensor(self):
         #sensorReading = self.wifiComm.read()
@@ -26,7 +29,69 @@ class RobotController:
         for n in updatedGrids:
             x, y = n[0], n[1]
             self.ui.drawGrid(x, y)
-        
+
+
+    def checkTrack(self):
+        if self.trackPosition[self.robot.y][self.robot.x] == True and self.trackOrientation[self.robot.y][self.robot.x][self.robot.orientation.value] == True:
+            return False
+        else:
+            self.trackPosition[self.robot.y][self.robot.x] = True
+            self.trackOrientation[self.robot.y][self.robot.x][self.robot.orientation.value] = True
+            return True
+
+    def moveToOuterWall(self):
+        # Assumption --> robot is looking at WEST direction
+        for i in range (0, 3):
+            self.checkGoalReached()
+            self.robot.do('R')
+            self.robotReadSensor()
+            self.ui.drawRobot()
+            # self.wifiComm.write("1" + action)
+
+        # Go downward
+        temp = True
+        while temp == True:
+            self.checkGoalReached()
+            temp = self.robot.do('F')
+            self.robotReadSensor()
+            self.ui.drawRobot()
+            # self.wifiComm.write("1" + action)
+
+            # The statement inside the IF will not be executed
+            # This statement only updates the Percentage mainly
+            if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
+                break
+
+        self.checkGoalReached()
+        self.robot.do('R')
+        self.robotReadSensor()
+        self.ui.drawRobot()
+        # self.wifiComm.write("1" + action)
+
+    def subAlgo(self):
+        if self.checkTracking == True and self.checkTrack() == False:
+            # Go forward until it hits a wall
+            temp = True
+            while temp == True:
+                self.checkGoalReached()
+                temp = self.robot.do('F')
+                self.robotReadSensor()
+                self.ui.drawRobot()
+                # self.wifiComm.write("1" + action)
+
+                # The statement inside the IF will not be executed
+                # This statement only updates the Percentage mainly
+                if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
+                    return False
+
+            self.checkGoalReached()
+            self.robot.do('R')
+            self.robotReadSensor()
+            self.ui.drawRobot()
+            # self.wifiComm.write("1" + action)
+
+            # Only check whether the robot has passed the same position as before once and only once (ASSUMPTION!)
+            self.checkTracking = False
 
     def explore(self):
         # Start WiFi
@@ -49,10 +114,17 @@ class RobotController:
 
 ######################################################################################################################
 
+        # Initial pre-defined movement --> going for down ward, then turn left
+        # self.moveToOuterWall()
+
+######################################################################################################################
+
         # Probably before going into the loop, tell the robot to do self adjustment
         while True:
-            # Data sent --> (x, y, orientation, mapKnowledge)
-            #actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm()], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+            # A*
+            # actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm()], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+
+            # Wall hugging
             actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), "--ganteng"], stdout=subprocess.PIPE).communicate()[0].decode().strip()
 
             # actions = self.wifiComm.read()
@@ -64,12 +136,17 @@ class RobotController:
             for action in actions:
                 # Check whether the robot has ever reached goal zone
                 self.checkGoalReached()
+
+                # Check whether the robot has gone through that particular grid
+                # DO THIS ONLY FOR WALL HUGGING
+                # Only track when it is moving forward, not when it is rotating
+                if self.subAlgo() == False:
+                    break
                 
                 # The robot simulator does the action
                 r = self.robot.do(action)
                 if r == False:
                     self.robotReadSensor()
-                    print("FALSE!!")
                     break
 
                 # Redraw robot
@@ -77,18 +154,7 @@ class RobotController:
 
 
                 # Send action to Arduino
-                #self.wifiComm.write("1" + action)
-
-
-                # Update map counter
-                updateMapCounter += 1
-
-
-                # Send the map to Android after UPDATE_MAP actions
-                # if updateMapCounter >= self.UPDATE_MAP:
-                    # print("Sending Robot's map knowledge to Android...")
-                    # updateMapCounter = 0
-                    # self.wifiComm.write("2" + self.robot.mapKnowledge.translateAndroid())
+                # self.wifiComm.write("1" + action)
 
 
                 self.robotReadSensor()

@@ -190,12 +190,19 @@ class MainUI(threading.Thread):
         self.drawMap()
         self.drawRobot()
 
-    # Remember that point (0, 0) is the left bottom most grid
+    """
+    Remember that point (0, 0) is the left bottom most grid.
+    This method draws the whole map ONLY IN THE VERY BEGINNING OF THE PROGRAM!!
+    """
     def drawMap(self):
         for i in range (0, self.arenaMap.MAP_HEIGHT):
             for j in range (0, self.arenaMap.MAP_WIDTH):
                 self.drawGrid(j, i)
 
+    """
+    This method is used to draw any grid in general.
+    This method is called inside the drawMap() method (see above) and when the robot is reading its sensors (during the robot simulation and real run)
+    """
     def drawGrid(self, x, y):
         gridState = self.arenaMap.getGridMap()[y][x].getGridState()
         if gridState == GridState.UNEXPLORED:
@@ -213,6 +220,11 @@ class MainUI(threading.Thread):
 
         return
 
+
+    """
+    Draw an obstacle grid.
+    This method is used when the user is creating the map from scratch (by clicking the given empty map).
+    """
     def drawObstacleGrid(self, x, y):
         gridState = self.obstacleMap.getGridMap()[y][x].getGridState()
         if gridState == GridState.UNEXPLORED:
@@ -222,6 +234,14 @@ class MainUI(threading.Thread):
 
         self.canvas.itemconfig(self.obstacleRectangles[y][x], fill=fillColor)
 
+
+    """
+    Draw the Robot itself!
+    Since the Python TKinter redrawing is very slow when drawing the whole map every time, we need to do a hack.
+    Every time the robot moves, the 3x1 footprint of the robot movement is redrawn based on that grid's current status (most likely a non-obstacle grid).
+
+    This is a tedious work, but the first solution that comes into my mind.
+    """
     def drawRobot(self):
         robotOrientation = self.robot.getOrientation()
         # self.setMapPercentage()
