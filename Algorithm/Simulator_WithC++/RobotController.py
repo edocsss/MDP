@@ -93,6 +93,9 @@ class RobotController:
             # Only check whether the robot has passed the same position as before once and only once (ASSUMPTION!)
             self.checkTracking = False
 
+    def isFinished(self):
+        return self.checkTrack()
+
     def explore(self):
         # Start WiFi
         # self.wifiComm.start()
@@ -115,7 +118,7 @@ class RobotController:
 ######################################################################################################################
 
         # Initial pre-defined movement --> going for down ward, then turn left
-        # self.moveToOuterWall()
+        self.moveToOuterWall()
 
 ######################################################################################################################
 
@@ -137,11 +140,18 @@ class RobotController:
                 # Check whether the robot has ever reached goal zone
                 self.checkGoalReached()
 
+                # Check whether the robot has done 1 full round
+                if self.isFinished() == False:
+                    stop = True
+                    break
+
                 # Check whether the robot has gone through that particular grid
                 # DO THIS ONLY FOR WALL HUGGING
                 # Only track when it is moving forward, not when it is rotating
-                if self.subAlgo() == False:
+                # if self.subAlgo() == False:
                     break
+
+                
                 
                 # The robot simulator does the action
                 r = self.robot.do(action)
