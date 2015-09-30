@@ -3,11 +3,8 @@ import re
 
 global server_uuid, server_port, android_queue, phone, nexus, mac_whitelist
 
-test_phone = "64:B4:73:1B:9F:96" # MAC address of my test phone 
 school_nexus = "08:60:6E:A5:A4:44" # MAC address of our nexus 7 
-test_tablet = "B4:3A:28:FA:55:1D" # MAC address of test tablet 
-my_nexus = "AC:22:0B:61:F3:D5"
-mac_whitelist = [test_phone, test_tablet, school_nexus, my_nexus]
+mac_whitelist = [school_nexus]
 
 server_uuid = "00001101-0000-1000-8000-00805f9b34fb"
 server_port = 5
