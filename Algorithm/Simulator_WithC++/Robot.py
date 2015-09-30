@@ -15,7 +15,7 @@ class Robot:
         # (x, y) = (1, 1) because we assume that the robot is 3 x 3 and it is placed right
         # in the middle of the 3 x 3 box
         self.x = 1
-        self.y = 3
+        self.y = 1
         self.orientation = RobotOrientation.FRONT
 
         # For sensor reading simplicity, the POSITION of the sensor is as if the sensor is placed in the front and then rotated
