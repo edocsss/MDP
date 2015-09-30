@@ -39,9 +39,9 @@ robotController.explore()
 mapDescriptor.writeMapDescription(robot.getMapKnowledge())
 
 # START FASTEST PATH RUN
-while wifiComm.read() != "P":
-     print("WRONG FASTEST PATH RUN CODE!")
-     time.sleep(0.01)
+##while wifiComm.read() != "P":
+##     print("WRONG FASTEST PATH RUN CODE!")
+##     time.sleep(0.01)
 
 # LAST RUN!! Wait for Android
 if robotController.goalReached == True:
