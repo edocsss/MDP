@@ -23,8 +23,9 @@ class RobotController:
         self.checkTracking = True
 
     def robotReadSensor(self):
-        #sensorReading = self.wifiComm.read()
-        #self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
+        sensorReading = self.wifiComm.read()
+        self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
+        
         updatedGrids = self.robot.readSensors(self.completeMap)
         for n in updatedGrids:
             x, y = n[0], n[1]
@@ -98,13 +99,13 @@ class RobotController:
 
     def explore(self):
         # Start WiFi
-        # self.wifiComm.start()
+        self.wifiComm.start()
 
 
         # Wait for Android initialization
-        #while self.wifiComm.read() != 'S':
-        #    print("WRONG EXPLORATION START CODE!")
-        #    time.sleep(0.01)
+        while self.wifiComm.read() != 'S':
+            print("WRONG EXPLORATION START CODE!")
+            time.sleep(0.01)
 
 
         stop = False
@@ -118,14 +119,14 @@ class RobotController:
 ######################################################################################################################
 
         # Initial pre-defined movement --> going for down ward, then turn left
-        self.moveToOuterWall()
+        # self.moveToOuterWall()
 
 ######################################################################################################################
 
         # Probably before going into the loop, tell the robot to do self adjustment
         while True:
             # A*
-            # actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm()], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+            # actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm()], stdout=subprocess.PIPE).communicate()[0].decode().strip() 
 
             # Wall hugging
             actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), "--ganteng"], stdout=subprocess.PIPE).communicate()[0].decode().strip()
@@ -141,14 +142,11 @@ class RobotController:
                 self.checkGoalReached()
 
                 # Check whether the robot has done 1 full round
+                # ONLY FOR WALL HUGGING ALGORITHM
                 if self.isFinished() == False:
+                    print()
+                    print("Robot has do one round! Stopping...")
                     stop = True
-                    break
-
-                # Check whether the robot has gone through that particular grid
-                # DO THIS ONLY FOR WALL HUGGING
-                # Only track when it is moving forward, not when it is rotating
-                # if self.subAlgo() == False:
                     break
 
                 
@@ -156,7 +154,9 @@ class RobotController:
                 # The robot simulator does the action
                 r = self.robot.do(action)
                 if r == False:
-                    self.robotReadSensor()
+                    print()
+                    print("Robot is banging to the outer wall!")
+                    # self.robotReadSensor()
                     break
 
                 # Redraw robot
@@ -164,7 +164,7 @@ class RobotController:
 
 
                 # Send action to Arduino
-                # self.wifiComm.write("1" + action)
+                self.wifiComm.write("1" + action)
 
 
                 self.robotReadSensor()
@@ -173,6 +173,8 @@ class RobotController:
                 # This checking must be done here because if not, there will be one extra ROBOT drawing (including one moveForward())
                 # If the checking is done in ui.drawRobot(), the moveForward() cannot be prevented although the robot should have stopped already before moving forward
                 if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
+                    print()
+                    print("TIMEOUT / PERCENTAGE AUTOMATIC TERMINATION!")
                     stop = True
                     break
 
@@ -184,7 +186,7 @@ class RobotController:
 
         # Last sensor reading & update
         # Read sensors reading from Arduino
-        self.robotReadSensor()
+        # self.robotReadSensor()
 
 
         # Last percentage update
@@ -199,7 +201,7 @@ class RobotController:
         # This is only useful for A* based algorithm
         # For Wall Hugging, we can assume that the robot always steps into the goal zone once and only once
         if self.goalReached == True:
-            print("Going back to start zone only because we have not reached the goal zone...")
+            print("Going back to start zone only because we have reached the goal zone...")
             self.fastestPathRun(1, 1)
         else:
             # Check whether the 3x3 goal zone has been explored all
@@ -235,5 +237,5 @@ class RobotController:
 
 
     def checkGoalReached(self):
-        if self.goalReached == False and self.robot.x == ArenaMap.MAP_WIDTH - 2 and self.robot.y == ArenaMap.MAP_HEIGHT - 2:
+        if self.goalReached == False and self.robot.mapKnowledge.isGoalZoneExplored() == True:
             self.goalReached = True
