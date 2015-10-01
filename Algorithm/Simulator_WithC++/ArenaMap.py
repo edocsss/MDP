@@ -66,6 +66,16 @@ class ArenaMap:
     def __getitem__(self, key):
         return self.gridMap[key]
 
+    def isGoalZoneExplored(self):
+        for i in range (-1, 2):
+            for j in range (-1, 2):
+                if self.gridMap[self.MAP_HEIGHT - 2 + i][self.MAP_WIDTH - 2 + j].state == GridState.END_ZONE:
+                    return False
+
+        return True
+
+    
+
     def countExploredGrids(self):
         count = 0
         for m in range (0, self.MAP_HEIGHT):
