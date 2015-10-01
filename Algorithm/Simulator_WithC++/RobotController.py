@@ -198,17 +198,24 @@ class RobotController:
 
 
         # RUN FASTEST PATH ALGORITHM HERE TO END ZONE (ArenaMap.MAP_WIDTH - 1, ArenaMap.MAP_HEIGHT - 1)
+        # This is only useful for A* based algorithm
+        # For Wall Hugging, we can assume that the robot always steps into the goal zone once and only once
         if self.goalReached == True:
             print("Going back to start zone only because we have not reached the goal zone...")
             self.fastestPathRun(1, 1)
         else:
-            print("Going to end zone if not reached yet...")
-            self.fastestPathRun(ArenaMap.MAP_WIDTH - 2, ArenaMap.MAP_HEIGHT - 2)
+            # Check whether the 3x3 goal zone has been explored all
+            if self.robot.mapKnowledge.isGoalZoneExplored() == True:            
+                print("Going to end zone if not reached yet...")
+                self.fastestPathRun(ArenaMap.MAP_WIDTH - 2, ArenaMap.MAP_HEIGHT - 2)
 
-            # RUN FASTEST PATH ALGORITHM HERE TO GO BACK TO (1,1) --> ROBOT'S CENTRAL POSITION
-            time.sleep(0.1)
-            print("Going back to start zone...")
-            self.fastestPathRun(1, 1)
+                # RUN FASTEST PATH ALGORITHM HERE TO GO BACK TO (1,1) --> ROBOT'S CENTRAL POSITION
+                print("Going back to start zone...")
+                self.fastestPathRun(1, 1)
+            else:
+                print("Goal zone has not been explored! Impossible to do a fastest path run to end zone")
+                print("Going back to start zone...")
+                self.fastestPathRun(1, 1)
 
 
     def fastestPathRun(self, targetX, targetY):
