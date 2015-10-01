@@ -23,8 +23,8 @@ class RobotController:
         self.checkTracking = True
 
     def robotReadSensor(self):
-        #sensorReading = self.wifiComm.read()
-        #self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
+        sensorReading = self.wifiComm.read()
+        self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
         updatedGrids = self.robot.readSensors(self.completeMap)
         for n in updatedGrids:
             x, y = n[0], n[1]
@@ -46,7 +46,7 @@ class RobotController:
             self.robot.do('R')
             self.robotReadSensor()
             self.ui.drawRobot()
-            # self.wifiComm.write("1" + action)
+            self.wifiComm.write("1" + action)
 
         # Go downward
         temp = True
@@ -55,7 +55,7 @@ class RobotController:
             temp = self.robot.do('F')
             self.robotReadSensor()
             self.ui.drawRobot()
-            # self.wifiComm.write("1" + action)
+            self.wifiComm.write("1" + action)
 
             # The statement inside the IF will not be executed
             # This statement only updates the Percentage mainly
@@ -66,7 +66,7 @@ class RobotController:
         self.robot.do('R')
         self.robotReadSensor()
         self.ui.drawRobot()
-        # self.wifiComm.write("1" + action)
+        self.wifiComm.write("1" + action)
 
     def subAlgo(self):
         if self.checkTracking == True and self.checkTrack() == False:
@@ -77,7 +77,7 @@ class RobotController:
                 temp = self.robot.do('F')
                 self.robotReadSensor()
                 self.ui.drawRobot()
-                # self.wifiComm.write("1" + action)
+                self.wifiComm.write("1" + action)
 
                 # The statement inside the IF will not be executed
                 # This statement only updates the Percentage mainly
@@ -88,7 +88,7 @@ class RobotController:
             self.robot.do('R')
             self.robotReadSensor()
             self.ui.drawRobot()
-            # self.wifiComm.write("1" + action)
+            self.wifiComm.write("1" + action)
 
             # Only check whether the robot has passed the same position as before once and only once (ASSUMPTION!)
             self.checkTracking = False
@@ -98,13 +98,13 @@ class RobotController:
 
     def explore(self):
         # Start WiFi
-        # self.wifiComm.start()
+        self.wifiComm.start()
 
 
         # Wait for Android initialization
-        #while self.wifiComm.read() != 'S':
-        #    print("WRONG EXPLORATION START CODE!")
-        #    time.sleep(0.01)
+        while self.wifiComm.read() != 'S':
+            print("WRONG EXPLORATION START CODE!")
+            time.sleep(0.01)
 
 
         stop = False
@@ -118,7 +118,7 @@ class RobotController:
 ######################################################################################################################
 
         # Initial pre-defined movement --> going for down ward, then turn left
-        self.moveToOuterWall()
+        # self.moveToOuterWall()
 
 ######################################################################################################################
 
@@ -130,7 +130,9 @@ class RobotController:
             # Wall hugging
             actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), "--ganteng"], stdout=subprocess.PIPE).communicate()[0].decode().strip()
 
+            # Manual test
             # actions = self.wifiComm.read()
+            
             if len(actions) == 0:
                 break
 
@@ -149,22 +151,22 @@ class RobotController:
                 # DO THIS ONLY FOR WALL HUGGING
                 # Only track when it is moving forward, not when it is rotating
                 # if self.subAlgo() == False:
-                    break
+                #    break
 
                 
                 
                 # The robot simulator does the action
                 r = self.robot.do(action)
-                if r == False:
-                    self.robotReadSensor()
-                    break
+                # if r == False:
+                    # self.robotReadSensor()
+                    # break
 
                 # Redraw robot
                 self.ui.drawRobot()
 
 
                 # Send action to Arduino
-                # self.wifiComm.write("1" + action)
+                self.wifiComm.write("1" + action)
 
 
                 self.robotReadSensor()
