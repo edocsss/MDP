@@ -25,7 +25,7 @@ class RobotController:
     def robotReadSensor(self):
         sensorReading = self.wifiComm.read()
         self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
-        
+
         updatedGrids = self.robot.readSensors(self.completeMap)
         for n in updatedGrids:
             x, y = n[0], n[1]
@@ -47,7 +47,7 @@ class RobotController:
             self.robot.do('R')
             self.robotReadSensor()
             self.ui.drawRobot()
-            # self.wifiComm.write("1" + action)
+            self.wifiComm.write("1" + action)
 
         # Go downward
         temp = True
@@ -56,7 +56,7 @@ class RobotController:
             temp = self.robot.do('F')
             self.robotReadSensor()
             self.ui.drawRobot()
-            # self.wifiComm.write("1" + action)
+            self.wifiComm.write("1" + action)
 
             # The statement inside the IF will not be executed
             # This statement only updates the Percentage mainly
@@ -67,7 +67,7 @@ class RobotController:
         self.robot.do('R')
         self.robotReadSensor()
         self.ui.drawRobot()
-        # self.wifiComm.write("1" + action)
+        self.wifiComm.write("1" + action)
 
     def subAlgo(self):
         if self.checkTracking == True and self.checkTrack() == False:
@@ -78,7 +78,7 @@ class RobotController:
                 temp = self.robot.do('F')
                 self.robotReadSensor()
                 self.ui.drawRobot()
-                # self.wifiComm.write("1" + action)
+                self.wifiComm.write("1" + action)
 
                 # The statement inside the IF will not be executed
                 # This statement only updates the Percentage mainly
@@ -89,7 +89,7 @@ class RobotController:
             self.robot.do('R')
             self.robotReadSensor()
             self.ui.drawRobot()
-            # self.wifiComm.write("1" + action)
+            self.wifiComm.write("1" + action)
 
             # Only check whether the robot has passed the same position as before once and only once (ASSUMPTION!)
             self.checkTracking = False
@@ -131,7 +131,9 @@ class RobotController:
             # Wall hugging
             actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), "--ganteng"], stdout=subprocess.PIPE).communicate()[0].decode().strip()
 
+            # Manual test
             # actions = self.wifiComm.read()
+            
             if len(actions) == 0:
                 break
 
@@ -149,6 +151,14 @@ class RobotController:
                     stop = True
                     break
 
+
+
+                # Check whether the robot has gone through that particular grid
+                # DO THIS ONLY FOR WALL HUGGING
+                # Only track when it is moving forward, not when it is rotating
+                # if self.subAlgo() == False:
+                #    break
+
                 
                 
                 # The robot simulator does the action
@@ -158,6 +168,7 @@ class RobotController:
                     print("Robot is banging to the outer wall!")
                     # self.robotReadSensor()
                     break
+
 
                 # Redraw robot
                 self.ui.drawRobot()
