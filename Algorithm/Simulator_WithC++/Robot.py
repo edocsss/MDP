@@ -425,6 +425,7 @@ class Robot:
 
     def placeObstaclesFromRobotReading(self, sensorReading, dummyMap):
         gridMap = dummyMap.getGridMap()
+        stateException = [GridState.EXPLORED_WITH_OBSTACLE, GridState.EXPLORED_NO_OBSTACLE, GridState.START_ZONE, GridState.END_ZONE, GridState.START_ZONE_EXPLORED, GridState.END_ZONE_EXPLORED]
         for i in range (0, len(self.sensors)):
             reading = int(sensorReading[i].strip())
             sensor = self.sensors[i]
@@ -439,7 +440,10 @@ class Robot:
                     posY = self.y + sensorPosition[1] + reading + 1
                     posX = self.x + sensorPosition[0]
 
-                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                    if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0 and gridMap:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
 
                 elif self.orientation == RobotOrientation.BACK:
@@ -447,6 +451,9 @@ class Robot:
                     posX = self.x - sensorPosition[0]
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
 
                 elif self.orientation == RobotOrientation.LEFT:
@@ -454,6 +461,9 @@ class Robot:
                     posX = self.x - sensorPosition[1] - reading - 1
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
 
                 elif self.orientation == RobotOrientation.RIGHT:
@@ -461,6 +471,9 @@ class Robot:
                     posX = self.x + sensorPosition[1] + reading + 1
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
 
             elif sensor.getOrientation() == SensorPosition.LEFT_SENSOR:
@@ -469,6 +482,9 @@ class Robot:
                     posX = self.x - sensorPosition[1] - reading - 1
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
 
                 elif self.orientation == RobotOrientation.BACK:
@@ -476,6 +492,9 @@ class Robot:
                     posX = self.x + sensorPosition[1] + reading + 1
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
 
                 elif self.orientation == RobotOrientation.LEFT:
@@ -483,6 +502,9 @@ class Robot:
                     posX = self.x - sensorPosition[0]
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
 
                 elif self.orientation == RobotOrientation.RIGHT:
@@ -490,6 +512,9 @@ class Robot:
                     posX = self.x + sensorPosition[0]
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
 
             elif sensor.getOrientation() == SensorPosition.RIGHT_SENSOR:
@@ -498,6 +523,9 @@ class Robot:
                     posX = self.x + sensorPosition[1] + reading + 1
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
 
                 elif self.orientation == RobotOrientation.BACK:
@@ -505,6 +533,9 @@ class Robot:
                     posX = self.x - sensorPosition[1] - reading - 1
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
 
                 elif self.orientation == RobotOrientation.LEFT:
@@ -512,6 +543,9 @@ class Robot:
                     posX = self.x + sensorPosition[0]
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
 
                 elif self.orientation == RobotOrientation.RIGHT:
@@ -519,4 +553,7 @@ class Robot:
                     posX = self.x - sensorPosition[0]
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
+                        if gridMap[posY][posX].state in stateException:
+                            continue
+                        
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)

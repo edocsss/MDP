@@ -237,7 +237,7 @@ class RobotController:
             self.robot.do(action)
 
             # Send action to Arduino
-            # self.wifiComm.write("1" + action)
+            self.wifiComm.write("1" + action)
 
             self.ui.drawRobot()
 
