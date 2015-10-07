@@ -30,7 +30,6 @@ class RobotController:
         sensorReading = self.wifiComm.read()
         self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
 
-        self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
         updatedGrids = self.robot.readSensors(self.completeMap)
         for n in updatedGrids:
             x, y = n[0], n[1]

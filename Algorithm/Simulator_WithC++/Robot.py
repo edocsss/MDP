@@ -14,9 +14,9 @@ class Robot:
     def __init__(self, initialMap):
         # (x, y) = (1, 1) because we assume that the robot is 3 x 3 and it is placed right
         # in the middle of the 3 x 3 box
-        self.x = 1
-        self.y = 1
-        self.orientation = RobotOrientation.FRONT
+        self.x = 12
+        self.y = 18
+        self.orientation = RobotOrientation.RIGHT
 
         # For sensor reading simplicity, the POSITION of the sensor is as if the sensor is placed in the front and then rotated
         self.sensors = [
@@ -463,8 +463,6 @@ class Robot:
                     posY = self.y + sensorPosition[0]
                     posX = self.x - sensorPosition[1] - reading - 1
 
-                    print(gridMap[posY][posX].state)
-
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
                         if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
@@ -474,8 +472,6 @@ class Robot:
                 elif self.orientation == RobotOrientation.RIGHT:
                     posY = self.y - sensorPosition[0]
                     posX = self.x + sensorPosition[1] + reading + 1
-
-                    print(gridMap[posY][posX].state)
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
                         if self.mapKnowledge.gridMap[posY][posX].state in stateException:
