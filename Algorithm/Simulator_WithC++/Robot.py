@@ -424,6 +424,9 @@ class Robot:
         return result
 
     def placeObstaclesFromRobotReading(self, sensorReading, dummyMap):
+        # This GridMap is only for updating the OBSTACLE MAP
+        # Then the robot will use this OBSTACLE MAP AS IF it is a simulation, the wall obstacle is put into the obstacle map during the real run
+        # When reading the sensor, the robot will ACTUALLY UPDATE its knowledge
         gridMap = dummyMap.getGridMap()
         stateException = [GridState.EXPLORED_WITH_OBSTACLE, GridState.EXPLORED_NO_OBSTACLE, GridState.START_ZONE, GridState.END_ZONE, GridState.START_ZONE_EXPLORED, GridState.END_ZONE_EXPLORED]
         for i in range (0, len(self.sensors)):
@@ -441,7 +444,7 @@ class Robot:
                     posX = self.x + sensorPosition[0]
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0 and gridMap:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
@@ -451,7 +454,7 @@ class Robot:
                     posX = self.x - sensorPosition[0]
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
@@ -460,8 +463,10 @@ class Robot:
                     posY = self.y + sensorPosition[0]
                     posX = self.x - sensorPosition[1] - reading - 1
 
+                    print(gridMap[posY][posX].state)
+
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
@@ -470,8 +475,10 @@ class Robot:
                     posY = self.y - sensorPosition[0]
                     posX = self.x + sensorPosition[1] + reading + 1
 
+                    print(gridMap[posY][posX].state)
+
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
@@ -482,7 +489,7 @@ class Robot:
                     posX = self.x - sensorPosition[1] - reading - 1
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
@@ -492,7 +499,7 @@ class Robot:
                     posX = self.x + sensorPosition[1] + reading + 1
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
@@ -502,7 +509,7 @@ class Robot:
                     posX = self.x - sensorPosition[0]
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
@@ -512,7 +519,7 @@ class Robot:
                     posX = self.x + sensorPosition[0]
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
@@ -523,7 +530,7 @@ class Robot:
                     posX = self.x + sensorPosition[1] + reading + 1
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
@@ -533,7 +540,7 @@ class Robot:
                     posX = self.x - sensorPosition[1] - reading - 1
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
@@ -543,7 +550,7 @@ class Robot:
                     posX = self.x + sensorPosition[0]
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
@@ -553,7 +560,7 @@ class Robot:
                     posX = self.x - sensorPosition[0]
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
-                        if gridMap[posY][posX].state in stateException:
+                        if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
                         
                         gridMap[posY][posX].setGridState(GridState.EXPLORED_WITH_OBSTACLE)
