@@ -34,7 +34,7 @@ class MainUI(threading.Thread):
         self.robot = robot
         self.robotSpeed = 0.1
         self.maxPercentage = 100.00
-        self.maxTime = 100000.00 # In seconds
+        self.maxTime = 345.00 # In seconds
         self.startTime = time.time() # Any initial time --> does not really matter since the starting time will be overwritten in self.startExplore()
 
     def open(self):
