@@ -28,9 +28,13 @@ class RobotController:
 
     def robotReadSensor(self):
         sensorReading = self.wifiComm.read()
+
+        # In case the first reading is a wrong reading, not all digits, re-read the next data
+        while sensorReading.isdigit() == False:
+            sensorReading = self.wifiComm.read()
+            
         self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
 
-        self.robot.placeObstaclesFromRobotReading(sensorReading, self.completeMap)
         updatedGrids = self.robot.readSensors(self.completeMap)
         for n in updatedGrids:
             x, y = n[0], n[1]
@@ -45,35 +49,35 @@ class RobotController:
             self.trackOrientation[self.robot.y][self.robot.x][self.robot.orientation.value] = True
             return True
 
-    def moveToOuterWall(self):
-        # Assumption --> robot is looking at WEST direction
-        # for i in range (0, 3):
-        #     self.checkGoalReached()
-        #     self.robot.do('R')
-        #     self.robotReadSensor()
-        #     self.ui.drawRobot()
-        #     self.wifiComm.write("1R")
-
-        # Go downward
-        temp = True
-        while temp == True:
-            self.checkGoalReached()
-            temp = self.robot.do('F')
-            self.robotReadSensor()
-            self.ui.drawRobot()
-            self.wifiComm.write("1F")
-
-            # The statement inside the IF will not be executed
-            # This statement only updates the Percentage mainly
-            if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
-                break
-
-        # Prepare for Wall Hugging
-        self.checkGoalReached()
-        self.robot.do('R')
-        self.robotReadSensor()
-        self.ui.drawRobot()
-        self.wifiComm.write("1R")
+##    def moveToOuterWall(self):
+##        # Assumption --> robot is looking at WEST direction
+##        # for i in range (0, 3):
+##        #     self.checkGoalReached()
+##        #     self.robot.do('R')
+##        #     self.robotReadSensor()
+##        #     self.ui.drawRobot()
+##        #     self.wifiComm.write("1R")
+##
+##        # Go downward
+##        temp = True
+##        while temp == True:
+##            self.checkGoalReached()
+##            temp = self.robot.do('F')
+##            self.robotReadSensor()
+##            self.ui.drawRobot()
+##            self.wifiComm.write("1F")
+##
+##            # The statement inside the IF will not be executed
+##            # This statement only updates the Percentage mainly
+##            if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
+##                break
+##
+##        # Prepare for Wall Hugging
+##        self.checkGoalReached()
+##        self.robot.do('R')
+##        self.robotReadSensor()
+##        self.ui.drawRobot()
+##        self.wifiComm.write("1R")
 
     # def subAlgo(self):
     #     if self.checkTracking == True and self.checkTrack() == False:
@@ -241,6 +245,11 @@ class RobotController:
                 print("Goal zone has not been explored! Impossible to do a fastest path run to end zone")
                 print("Going back to start zone...")
                 self.fastestPathRun(1, 1)
+
+
+        ### ACKNOWLEDGE TO ROBOT THAT EXPLORATION HAS BEEN DONE AND NEEDS ALIGNMENT ###
+        ### HOWEVER, BEFORE SENDING THE "!", NEED TO DEFINE WHERE THE ROBOT SHOULD BE FACING!!
+        self.wifiComm.write("1!")
 
 
     def fastestPathRun(self, targetX, targetY):

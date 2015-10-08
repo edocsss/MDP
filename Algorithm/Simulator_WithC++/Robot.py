@@ -124,12 +124,16 @@ class Robot:
             self.orientation = RobotOrientation.LEFT
 
     def do(self, action):
-        if action == 'F':
-            return self.moveForward()
-        elif action == 'L':
+        if action == 'L' or action == '<':
             self.rotateLeft()
-        elif action == 'R':
+        elif action == 'R' or action == '>':
             self.rotateRight()
+        elif action == 'F':
+            return self.moveForward()
+        else:
+            counter = ord(action) - ord('a') + 1
+            for i in range (0, counter):
+                self.moveForward()
 
     # Returns the Grid position where it should be updated
     def readSensors(self, completeMap):
@@ -463,8 +467,6 @@ class Robot:
                     posY = self.y + sensorPosition[0]
                     posX = self.x - sensorPosition[1] - reading - 1
 
-                    print(gridMap[posY][posX].state)
-
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
                         if self.mapKnowledge.gridMap[posY][posX].state in stateException:
                             continue
@@ -474,8 +476,6 @@ class Robot:
                 elif self.orientation == RobotOrientation.RIGHT:
                     posY = self.y - sensorPosition[0]
                     posX = self.x + sensorPosition[1] + reading + 1
-
-                    print(gridMap[posY][posX].state)
 
                     if posY < ArenaMap.ArenaMap.MAP_HEIGHT and posY >= 0 and posX < ArenaMap.ArenaMap.MAP_WIDTH and posX >= 0:
                         if self.mapKnowledge.gridMap[posY][posX].state in stateException:
