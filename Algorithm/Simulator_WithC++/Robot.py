@@ -14,9 +14,9 @@ class Robot:
     def __init__(self, initialMap):
         # (x, y) = (1, 1) because we assume that the robot is 3 x 3 and it is placed right
         # in the middle of the 3 x 3 box
-        self.x = 12
-        self.y = 18
-        self.orientation = RobotOrientation.RIGHT
+        self.x = 1
+        self.y = 1
+        self.orientation = RobotOrientation.FRONT
 
         # For sensor reading simplicity, the POSITION of the sensor is as if the sensor is placed in the front and then rotated
         self.sensors = [
@@ -124,12 +124,16 @@ class Robot:
             self.orientation = RobotOrientation.LEFT
 
     def do(self, action):
-        if action == 'F':
-            return self.moveForward()
-        elif action == 'L':
+        if action == 'L' or action == '<':
             self.rotateLeft()
-        elif action == 'R':
+        elif action == 'R' or action == '>':
             self.rotateRight()
+        elif action == 'F':
+            return self.moveForward()
+        else:
+            counter = ord(action) - ord('a') + 1
+            for i in range (0, counter):
+                self.moveForward()
 
     # Returns the Grid position where it should be updated
     def readSensors(self, completeMap):
