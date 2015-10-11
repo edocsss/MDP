@@ -17,7 +17,8 @@ port = 5005
 # Status variable
 startExplore = False
 
-# Different ArenaMap for different testing
+# obstacleMap --> used in MainUI for the placement of the obstacle
+# initialMap --> used in Robot and MainUI for drawing the obstacles when the robot reads its sensor
 obstacleMap = ArenaMap.ArenaMap()
 initialMap = ArenaMap.ArenaMap()
 

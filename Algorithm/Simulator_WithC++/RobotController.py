@@ -124,7 +124,34 @@ class RobotController:
             return False
         else:
             return True
+
+
+
+        
         # return self.checkTrack()
+
+
+
+
+
+
+
+
+
+    """
+    Update the final arena simulator to accommodate the obstacle inference -> to comply with the last MapDescriptor.out content
+    """
+    def inferGridsColoring(self):
+        gridStates = [GridState.UNEXPLORED, GridState.START_ZONE, GridState.END_ZONE]
+        for i in range (0, ArenaMap.MAP_HEIGHT):
+            for j in range (0, ArenaMap.MAP_WIDTH):
+                print(self.robot.mapKnowledge.gridMap[i][j].state)
+                if self.robot.mapKnowledge.gridMap[i][j].state in gridStates:
+                    print(j, i)
+                    self.robot.mapKnowledge.gridMap[i][j].state = GridState.EXPLORED_NO_OBSTACLE
+                    self.ui.drawGrid(j, i)
+
+
 
     def explore(self):
         # Start WiFi
@@ -267,10 +294,15 @@ class RobotController:
         self.wifiComm.write("1!")
 
 
+        ### UPDATE MAP WITH THE INFERRED GRIDS!!!
+        self.inferGridsColoring()
+
+
     def fastestPathRun(self, targetX, targetY):
         print("Running fastest path algorithm...")
 
         actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), str(targetX), str(targetY)], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+        print(actions)
         for action in actions:
             self.robot.do(action)
 
