@@ -54,7 +54,7 @@ class RobotController:
 ##        # Assumption --> robot is looking at WEST direction
 ##        # for i in range (0, 3):
 ##        #     self.checkGoalReached()
-##        #     self.robot.do('R')
+##        #     self.robot.do('R', self.ui)
 ##        #     self.robotReadSensor()
 ##        #     self.ui.drawRobot()
 ##        #     self.wifiComm.write("1R")
@@ -63,7 +63,7 @@ class RobotController:
 ##        temp = True
 ##        while temp == True:
 ##            self.checkGoalReached()
-##            temp = self.robot.do('F')
+##            temp = self.robot.do('F', self.ui)
 ##            self.robotReadSensor()
 ##            self.ui.drawRobot()
 ##            self.wifiComm.write("1F")
@@ -75,7 +75,7 @@ class RobotController:
 ##
 ##        # Prepare for Wall Hugging
 ##        self.checkGoalReached()
-##        self.robot.do('R')
+##        self.robot.do('R', self.ui)
 ##        self.robotReadSensor()
 ##        self.ui.drawRobot()
 ##        self.wifiComm.write("1R")
@@ -86,7 +86,7 @@ class RobotController:
     #         temp = True
     #         while temp == True:
     #             self.checkGoalReached()
-    #             temp = self.robot.do('F')
+    #             temp = self.robot.do('F', self.ui)
     #             self.robotReadSensor()
     #             self.ui.drawRobot()
     #             self.wifiComm.write("1F")
@@ -97,10 +97,10 @@ class RobotController:
     #                 return False
     #
     #         self.checkGoalReached()
-    #         self.robot.do('R')
+    #         self.robot.do('R', self.ui)
     #         self.robotReadSensor()
     #         self.ui.drawRobot()
-    #         self.wifiComm.write("1R")
+    #         self.wifiComm.write("1R", self.ui)
     #
     #         # Only check whether the robot has passed the same position as before once and only once (ASSUMPTION!)
     #         self.checkTracking = False
@@ -115,6 +115,8 @@ class RobotController:
         elif self.robot.orientation == RobotOrientation.BACK:
             self.robot.rotateLeft()
             self.robot.rotateLeft()
+
+        self.ui.drawRobot()
 
     def isFinished(self):
         if self.robot.x == self.initialX and self.robot.y == self.initialY:
@@ -145,9 +147,7 @@ class RobotController:
         gridStates = [GridState.UNEXPLORED, GridState.START_ZONE, GridState.END_ZONE]
         for i in range (0, ArenaMap.MAP_HEIGHT):
             for j in range (0, ArenaMap.MAP_WIDTH):
-                print(self.robot.mapKnowledge.gridMap[i][j].state)
                 if self.robot.mapKnowledge.gridMap[i][j].state in gridStates:
-                    print(j, i)
                     self.robot.mapKnowledge.gridMap[i][j].state = GridState.EXPLORED_NO_OBSTACLE
                     self.ui.drawGrid(j, i)
 
@@ -218,7 +218,7 @@ class RobotController:
                 
                 
                 # The robot simulator does the action
-                r = self.robot.do(action)
+                r = self.robot.do(action, self.ui)
                 if r == False:
                     print()
                     print("Robot is banging to the outer wall!")
@@ -240,11 +240,11 @@ class RobotController:
 
                 # This checking must be done here because if not, there will be one extra ROBOT drawing (including one moveForward())
                 # If the checking is done in ui.drawRobot(), the moveForward() cannot be prevented although the robot should have stopped already before moving forward
-                # if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
-                #    print()
-                #    print("TIMEOUT / PERCENTAGE AUTOMATIC TERMINATION!")
-                #    stop = True
-                #    break
+##                if self.ui.checkTimeout() == False: #or self.ui.setMapPercentage() == False:
+##                    print()
+##                    print("TIMEOUT / PERCENTAGE AUTOMATIC TERMINATION!")
+##                    stop = True
+    ##                    break
 
 
             # Stop the whole looping because we have reached the targeted TIMEOUT or PERCENTAGE
@@ -304,7 +304,7 @@ class RobotController:
         actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), str(targetX), str(targetY)], stdout=subprocess.PIPE).communicate()[0].decode().strip()
         print(actions)
         for action in actions:
-            self.robot.do(action)
+            self.robot.do(action, self.ui)
 
             # Send action to Arduino
             self.wifiComm.write("1" + action)
