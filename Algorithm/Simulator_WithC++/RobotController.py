@@ -1,6 +1,7 @@
 import copy
 import time
 import subprocess
+from RobotOrientation import *
 from ArenaMap import *
 
 __author__ = 'ECAND_000'
@@ -104,6 +105,17 @@ class RobotController:
     #         # Only check whether the robot has passed the same position as before once and only once (ASSUMPTION!)
     #         self.checkTracking = False
 
+    def faceNorth(self):
+        if self.robot.orientation == RobotOrientation.FRONT:
+            return
+        elif self.robot.orientation == RobotOrientation.LEFT:
+            self.robot.rotateRight()
+        elif self.robot.orientation == RobotOrientation.RIGHT:
+            self.robot.rotateLeft()
+        elif self.robot.orientation == RobotOrientation.BACK:
+            self.robot.rotateLeft()
+            self.robot.rotateLeft()
+
     def isFinished(self):
         if self.robot.x == self.initialX and self.robot.y == self.initialY:
             self.checkTrackingCounter += 1
@@ -112,7 +124,34 @@ class RobotController:
             return False
         else:
             return True
+
+
+
+        
         # return self.checkTrack()
+
+
+
+
+
+
+
+
+
+    """
+    Update the final arena simulator to accommodate the obstacle inference -> to comply with the last MapDescriptor.out content
+    """
+    def inferGridsColoring(self):
+        gridStates = [GridState.UNEXPLORED, GridState.START_ZONE, GridState.END_ZONE]
+        for i in range (0, ArenaMap.MAP_HEIGHT):
+            for j in range (0, ArenaMap.MAP_WIDTH):
+                print(self.robot.mapKnowledge.gridMap[i][j].state)
+                if self.robot.mapKnowledge.gridMap[i][j].state in gridStates:
+                    print(j, i)
+                    self.robot.mapKnowledge.gridMap[i][j].state = GridState.EXPLORED_NO_OBSTACLE
+                    self.ui.drawGrid(j, i)
+
+
 
     def explore(self):
         # Start WiFi
@@ -201,11 +240,11 @@ class RobotController:
 
                 # This checking must be done here because if not, there will be one extra ROBOT drawing (including one moveForward())
                 # If the checking is done in ui.drawRobot(), the moveForward() cannot be prevented although the robot should have stopped already before moving forward
-                if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
-                    print()
-                    print("TIMEOUT / PERCENTAGE AUTOMATIC TERMINATION!")
-                    stop = True
-                    break
+                # if self.ui.checkTimeout() == False or self.ui.setMapPercentage() == False:
+                #    print()
+                #    print("TIMEOUT / PERCENTAGE AUTOMATIC TERMINATION!")
+                #    stop = True
+                #    break
 
 
             # Stop the whole looping because we have reached the targeted TIMEOUT or PERCENTAGE
@@ -225,26 +264,29 @@ class RobotController:
         # Ending message
         print("Robot exploration done!")
 
+        # Face North
+        self.faceNorth()
+
 
         # RUN FASTEST PATH ALGORITHM HERE TO END ZONE (ArenaMap.MAP_WIDTH - 1, ArenaMap.MAP_HEIGHT - 1)
         # This is only useful for A* based algorithm
         # For Wall Hugging, we can assume that the robot always steps into the goal zone once and only once
-        if self.goalReached == True:
-            print("Going back to start zone only because we have reached the goal zone...")
-            self.fastestPathRun(1, 1)
-        else:
-            # Check whether the 3x3 goal zone has been explored all
-            if self.robot.mapKnowledge.isGoalZoneExplored() == True:            
-                print("Going to end zone if not reached yet...")
-                self.fastestPathRun(ArenaMap.MAP_WIDTH - 2, ArenaMap.MAP_HEIGHT - 2)
-
-                # RUN FASTEST PATH ALGORITHM HERE TO GO BACK TO (1,1) --> ROBOT'S CENTRAL POSITION
-                print("Going back to start zone...")
-                self.fastestPathRun(1, 1)
-            else:
-                print("Goal zone has not been explored! Impossible to do a fastest path run to end zone")
-                print("Going back to start zone...")
-                self.fastestPathRun(1, 1)
+##        if self.goalReached == True:
+##            print("Going back to start zone only because we have reached the goal zone...")
+##            self.fastestPathRun(1, 1)
+##        else:
+##            # Check whether the 3x3 goal zone has been explored all
+##            if self.robot.mapKnowledge.isGoalZoneExplored() == True:            
+##                print("Going to end zone if not reached yet...")
+##                self.fastestPathRun(ArenaMap.MAP_WIDTH - 2, ArenaMap.MAP_HEIGHT - 2)
+##
+##                # RUN FASTEST PATH ALGORITHM HERE TO GO BACK TO (1,1) --> ROBOT'S CENTRAL POSITION
+##                print("Going back to start zone...")
+##                self.fastestPathRun(1, 1)
+##            else:
+##                print("Goal zone has not been explored! Impossible to do a fastest path run to end zone")
+##                print("Going back to start zone...")
+##                self.fastestPathRun(1, 1)
 
 
         ### ACKNOWLEDGE TO ROBOT THAT EXPLORATION HAS BEEN DONE AND NEEDS ALIGNMENT ###
@@ -252,10 +294,15 @@ class RobotController:
         self.wifiComm.write("1!")
 
 
+        ### UPDATE MAP WITH THE INFERRED GRIDS!!!
+        self.inferGridsColoring()
+
+
     def fastestPathRun(self, targetX, targetY):
         print("Running fastest path algorithm...")
 
         actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), str(targetX), str(targetY)], stdout=subprocess.PIPE).communicate()[0].decode().strip()
+        print(actions)
         for action in actions:
             self.robot.do(action)
 

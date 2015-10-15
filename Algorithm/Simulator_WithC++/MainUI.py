@@ -29,12 +29,12 @@ class MainUI(threading.Thread):
 
     def __init__(self, arenaMap, obstacleMap, robot):
         threading.Thread.__init__(self)
-        self.arenaMap = arenaMap
-        self.obstacleMap = obstacleMap
+        self.arenaMap = arenaMap # this map is shared between the robot's knowledge and MainUI --> to update the robot position and robot's map knowledge
+        self.obstacleMap = obstacleMap # this map contains the COMPLETE MAP for simulation and REAL RUN --> in Real Run, however, the obstacle is put on the map when the robot reads the sensor
         self.robot = robot
         self.robotSpeed = 0.1
         self.maxPercentage = 100.00
-        self.maxTime = 100000.00 # In seconds
+        self.maxTime = 345.00 # In seconds
         self.startTime = time.time() # Any initial time --> does not really matter since the starting time will be overwritten in self.startExplore()
 
     def open(self):
@@ -205,6 +205,7 @@ class MainUI(threading.Thread):
     """
     def drawGrid(self, x, y):
         gridState = self.arenaMap.getGridMap()[y][x].getGridState()
+        print(gridState)
         if gridState == GridState.UNEXPLORED:
             fillColor = "#DDDDDD"
         elif gridState == GridState.EXPLORED_NO_OBSTACLE:

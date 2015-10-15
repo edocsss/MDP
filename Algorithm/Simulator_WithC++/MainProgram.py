@@ -17,7 +17,8 @@ port = 5005
 # Status variable
 startExplore = False
 
-# Different ArenaMap for different testing
+# obstacleMap --> used in MainUI for the placement of the obstacle
+# initialMap --> used in Robot and MainUI for drawing the obstacles when the robot reads its sensor
 obstacleMap = ArenaMap.ArenaMap()
 initialMap = ArenaMap.ArenaMap()
 
@@ -47,9 +48,8 @@ robotController.explore()
 mapDescriptor.writeMapDescription(robot.getMapKnowledge())
 
 # START FASTEST PATH RUN
-##    while wifiComm.read() != "P":
-##         print("WRONG FASTEST PATH RUN CODE!")
-##         time.sleep(0.01)
+while wifiComm.read() != "P":
+    time.sleep(0.01)
 
 # LAST RUN!! Wait for Android
 if robotController.goalReached == True:
