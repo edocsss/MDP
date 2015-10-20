@@ -123,7 +123,7 @@ class Robot:
         elif self.orientation == RobotOrientation.BACK:
             self.orientation = RobotOrientation.LEFT
 
-    def do(self, action):
+    def do(self, action, ui):
         if action == 'L' or action == '<':
             self.rotateLeft()
         elif action == 'R' or action == '>':
@@ -134,6 +134,7 @@ class Robot:
             counter = ord(action) - ord('a') + 1
             for i in range (0, counter):
                 self.moveForward()
+                ui.drawRobot()
 
     # Returns the Grid position where it should be updated
     def readSensors(self, completeMap):
