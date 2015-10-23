@@ -25,6 +25,7 @@ class RobotController:
 
         self.initialX = self.robot.x
         self.initialY = self.robot.y
+        self.initialOrientation = self.robot.orientation
         self.checkTrackingCounter = 0
 
     def robotReadSensor(self):
@@ -110,16 +111,20 @@ class RobotController:
             return
         elif self.robot.orientation == RobotOrientation.LEFT:
             self.robot.rotateRight()
+            self.wifiComm.write("1R")
         elif self.robot.orientation == RobotOrientation.RIGHT:
             self.robot.rotateLeft()
+            self.wifiComm.write("1L")
         elif self.robot.orientation == RobotOrientation.BACK:
             self.robot.rotateLeft()
+            self.wifiComm.write("1L")
             self.robot.rotateLeft()
+            self.wifiComm.write("1L")
 
         self.ui.drawRobot()
 
     def isFinished(self):
-        if self.robot.x == self.initialX and self.robot.y == self.initialY:
+        if self.robot.x == self.initialX and self.robot.y == self.initialY and self.robot.orientation == self.initialOrientation:
             self.checkTrackingCounter += 1
 
         if self.checkTrackingCounter == 2:
@@ -133,23 +138,6 @@ class RobotController:
         # return self.checkTrack()
 
 
-
-
-
-
-
-
-
-    """
-    Update the final arena simulator to accommodate the obstacle inference -> to comply with the last MapDescriptor.out content
-    """
-    def inferGridsColoring(self):
-        gridStates = [GridState.UNEXPLORED, GridState.START_ZONE, GridState.END_ZONE]
-        for i in range (0, ArenaMap.MAP_HEIGHT):
-            for j in range (0, ArenaMap.MAP_WIDTH):
-                if self.robot.mapKnowledge.gridMap[i][j].state in gridStates:
-                    self.robot.mapKnowledge.gridMap[i][j].state = GridState.EXPLORED_NO_OBSTACLE
-                    self.ui.drawGrid(j, i)
 
 
 
@@ -187,7 +175,7 @@ class RobotController:
             actions = subprocess.Popen(["search", str(self.robot.x), str(self.robot.y), str(self.robot.orientation.value), self.robot.mapKnowledge.translateAlgorithm(), "--ganteng"], stdout=subprocess.PIPE).communicate()[0].decode().strip()
 
             # Manual test
-            # actions = self.wifiComm.read()
+##            actions = self.wifiComm.read()
 
             # actions = []
             if len(actions) == 0:
@@ -201,7 +189,7 @@ class RobotController:
 
                 # Check whether the robot has done 1 full round
                 # ONLY FOR WALL HUGGING ALGORITHM
-                if action == 'F' and self.isFinished() == False:
+                if self.isFinished() == False:
                     print()
                     print("Robot has do one round! Stopping...")
                     stop = True
@@ -292,10 +280,6 @@ class RobotController:
         ### ACKNOWLEDGE TO ROBOT THAT EXPLORATION HAS BEEN DONE AND NEEDS ALIGNMENT ###
         ### HOWEVER, BEFORE SENDING THE "!", NEED TO DEFINE WHERE THE ROBOT SHOULD BE FACING!!
         self.wifiComm.write("1!")
-
-
-        ### UPDATE MAP WITH THE INFERRED GRIDS!!!
-        self.inferGridsColoring()
 
 
     def fastestPathRun(self, targetX, targetY):

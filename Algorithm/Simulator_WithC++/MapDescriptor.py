@@ -84,10 +84,9 @@ class MapDescriptor:
             for m in range (0, ArenaMap.ArenaMap.MAP_WIDTH):
                 gridState = gridMap[n][m].getGridState()
 
-##                if gridState == GridState.UNEXPLORED:
-##                    r1 += "0"
-                if gridState == GridState.UNEXPLORED \
-                        or gridState == GridState.EXPLORED_NO_OBSTACLE \
+                if gridState == GridState.UNEXPLORED:
+                    r1 += "0"
+                elif gridState == GridState.EXPLORED_NO_OBSTACLE \
                         or gridState == GridState.START_ZONE \
                         or gridState == GridState.END_ZONE \
                         or gridState == GridState.START_ZONE_EXPLORED \
