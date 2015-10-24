@@ -3,9 +3,11 @@ import MainUI
 import Robot
 import WifiComm
 import RobotController
+import RobotControllerSimulate
 import MapDescriptor
 import time
 import atexit
+import Config
 
 __author__ = 'ECAND_000'
 
@@ -48,8 +50,9 @@ robotController.explore()
 mapDescriptor.writeMapDescription(robot.getMapKnowledge())
 
 # START FASTEST PATH RUN
-while wifiComm.read() != "P":
-    time.sleep(0.01)
+if Config.realRun == True:
+    while wifiComm.read() != "P":
+        time.sleep(0.01)
 
 # LAST RUN!! Wait for Android
 if robotController.goalReached == True:

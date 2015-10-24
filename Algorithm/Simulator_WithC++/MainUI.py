@@ -205,7 +205,6 @@ class MainUI(threading.Thread):
     """
     def drawGrid(self, x, y):
         gridState = self.arenaMap.getGridMap()[y][x].getGridState()
-        print(gridState)
         if gridState == GridState.UNEXPLORED:
             fillColor = "#DDDDDD"
         elif gridState == GridState.EXPLORED_NO_OBSTACLE:
